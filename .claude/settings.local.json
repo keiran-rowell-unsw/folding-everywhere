@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import numpy; print\\('numpy', numpy.__version__\\)\")",
+      "Bash(python3 -)",
+      "Bash(file dist/*)",
+      "Bash(awk 'NR>=328 && NR<=460' diffusion.rs)",
+      "Bash(cargo build *)",
+      "Bash(nohup ./target/release/fold_standalone MQIFVKTLTGKTITLEVEPSDTIE 0 /tmp/e2_prog_coords.npy)",
+      "Bash(echo \"launched PID $!\")",
+      "Bash(kill -0 26235)",
+      "Read(//tmp/**)",
+      "Bash(awk 'NF')",
+      "Bash(awk '!seen[$0]++')",
+      "Bash(awk '$1==\"ATOM\" && $3==\"CA\"{print $4, $6}' prediction_esmfold1.pdb)",
+      "Bash(awk '{printf \"%s \", $1} END{print \"\"}')",
+      "Bash(awk '$1==\"ATOM\" && $3==\"CA\"' prediction_esmfold1.pdb)",
+      "Bash(awk '$1==\"ATOM\" && $3==\"CA\"{print $4, $6}' prediction_loop20_sampling28_seed0.pdb)",
+      "Bash(awk '$1==\"ATOM\" && $3==\"CA\"' prediction_loop20_sampling28_seed0.pdb)",
+      "Bash(python3 -c \"import torch; print\\('torch', torch.__version__\\)\")",
+      "Read(//home/lingxusb_gmail_com/.cache/huggingface/**)",
+      "Bash(find / -iname \"*esmfold*\" -size +100M)",
+      "Bash(~/esmfold2_venv/bin/python --version)",
+      "Bash(~/esmfold2_venv/bin/python -c \"import transformers, torch; print\\('transformers', transformers.__version__, '| torch', torch.__version__\\); import transformers.models.esmfold2 as m; print\\('esmfold2 module OK'\\)\")",
+      "Bash(python3 -c \"from transformers.models.esm.modeling_esmfold import EsmFoldingTrunk; import transformers; print\\('OK sys py, transformers', transformers.__version__\\)\")",
+      "Bash(~/esmfold2_venv/bin/python -c \"from transformers.models.esm.modeling_esmfold import EsmFoldingTrunk; print\\('OK venv has esm.modeling_esmfold'\\)\")",
+      "Bash(mkdir -p /tmp/claude-976187260/-home-lingxusb-gmail-com-github2/cdf83fbc-18a4-41c6-be1d-d8853a9c4b67/scratchpad/ref_out)",
+      "Bash(REF_THREADS=8 OMP_NUM_THREADS=8 ~/esmfold2_venv/bin/python ref_fold.py ubiquitin MQIFVKTLTGKTITLEVEPSDTIENVKAKIQDKEGIPPDQQRLIFAGKQLEDGRTLSDYNIQKESTLHLVLRLRGG /tmp/claude-976187260/-home-lingxusb-gmail-com-github2/cdf83fbc-18a4-41c6-be1d-d8853a9c4b67/scratchpad/ref_out/ref_esmfold1_ubiquitin.pdb)",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(grep -rn 'def infer_protein\\\\|def infer\\\\b\\\\|def output_to_pdb\\\\|num_sampling_steps\\\\|num_loops\\\\|num_diffusion_samples' __TRACKED_VAR__/modeling_esmfold2.py)"
+    ]
+  }
+}

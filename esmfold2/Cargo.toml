@@ -1,0 +1,22 @@
+[package]
+name = "esmfold2-fp32"
+version = "0.1.0"
+edition = "2021"
+description = "Pure-Rust fp32 bit-exact reimplementation of ESMFold2 (ESM-C 6B + diffusion)"
+
+[lib]
+name = "esmfold2"
+path = "src/lib.rs"
+
+[[bin]]
+name = "fold_standalone"
+path = "src/bin/fold_standalone.rs"
+
+[dependencies]
+memmap2 = "0.9"
+half = { version = "2", features = ["bytemuck"] }
+bytemuck = "1"
+rayon = "1.10"
+matrixmultiply = { version = "0.3", features = ["threading"] }
+libm = "0.2"
+serde_json = "1"

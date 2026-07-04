@@ -1,0 +1,7 @@
+num_loops,num_sampling_steps,n_atoms,rust_vs_pt_rmsd_A,rust_vs_pt_max_A,verdict
+3,14,352,7.255e-05,1.950e-04,bit-exact(fp32)
+6,14,352,1.210e-04,8.165e-04,bit-exact(fp32)
+10,14,352,9.647e-05,4.620e-04,bit-exact(fp32)
+3,28,352,1.055e-04,7.462e-04,bit-exact(fp32)
+3,42,352,8.456e-05,3.475e-04,bit-exact(fp32)
+6,28,352,1.113e-04,5.093e-04,bit-exact(fp32)

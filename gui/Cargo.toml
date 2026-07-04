@@ -1,0 +1,16 @@
+[package]
+name = "fold-gui-merged"
+version = "0.1.0"
+edition = "2021"
+description = "Unified ESMFold1 / ESMFold2 local-web GUI"
+
+[[bin]]
+name = "fold_gui"
+path = "src/main.rs"
+
+[dependencies]
+esmfold = { path = "../esmfold1", package = "esmfold1" }
+esmfold2 = { path = "../esmfold2", package = "esmfold2-fp32" }
+tiny_http = "0.12"
+
+serde_json = "1"

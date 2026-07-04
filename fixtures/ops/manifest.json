@@ -1,0 +1,86 @@
+[
+ {
+  "op": "linear",
+  "name": "linear_small",
+  "shape": [
+   7,
+   5
+  ]
+ },
+ {
+  "op": "linear",
+  "name": "linear_bigK",
+  "shape": [
+   4,
+   8
+  ]
+ },
+ {
+  "op": "matmul2d",
+  "name": "matmul_bigK",
+  "shape": [
+   6,
+   9
+  ]
+ },
+ {
+  "op": "layer_norm",
+  "name": "layernorm",
+  "shape": [
+   7,
+   2560
+  ],
+  "eps": 1e-05
+ },
+ {
+  "op": "gelu_erf",
+  "name": "gelu_erf",
+  "shape": [
+   1000
+  ]
+ },
+ {
+  "op": "sigmoid",
+  "name": "sigmoid",
+  "shape": [
+   1000
+  ]
+ },
+ {
+  "op": "softplus",
+  "name": "softplus",
+  "shape": [
+   1000
+  ]
+ },
+ {
+  "op": "relu",
+  "name": "relu",
+  "shape": [
+   1000
+  ]
+ },
+ {
+  "op": "softmax_last",
+  "name": "softmax_last",
+  "shape": [
+   7,
+   131
+  ]
+ },
+ {
+  "op": "rotary",
+  "name": "rotary",
+  "dim": 64,
+  "L": 20,
+  "H": 2
+ },
+ {
+  "op": "rotate_half",
+  "name": "rotate_half",
+  "shape": [
+   3,
+   64
+  ]
+ }
+]

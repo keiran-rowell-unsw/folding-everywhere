@@ -1,0 +1,42 @@
+warning: struct `ZipFileInfo` is never constructed
+  --> esmfold1/src/pth.rs:29:8
+   |
+29 | struct ZipFileInfo {
+   |        ^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `0` is never read
+   --> esmfold1/src/pth.rs:114:10
+    |
+114 |     Bool(bool),
+    |     ---- ^^^^
+    |     |
+    |     field in this variant
+    |
+    = note: `V` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+help: consider changing the field to be of unit type to suppress this warning while preserving the field numbering, or remove the field
+    |
+114 -     Bool(bool),
+114 +     Bool(()),
+    |
+
+warning: constant `C_S` is never used
+  --> esmfold1/src/structure.rs:12:7
+   |
+12 | const C_S: usize = 384;
+   |       ^^^
+
+warning: `esmfold1` (lib) generated 3 warnings
+   Compiling fold-gui-merged v0.1.0 (/home/lingxusb_gmail_com/github2/gui)
+warning: unused import: `std::io::Read`
+  --> gui/src/main.rs:10:5
+   |
+10 | use std::io::Read;
+   |     ^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `fold-gui-merged` (bin "fold_gui") generated 1 warning
+    Finished `release` profile [optimized] target(s) in 1.46s
+EXIT=0

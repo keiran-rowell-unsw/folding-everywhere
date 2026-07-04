@@ -1,0 +1,12 @@
+/target
+**/__pycache__
+*.pyc
+# large regenerable parity fixtures + model weights (see python/ to regenerate)
+/fixtures/lm
+/fixtures/trunk
+/fixtures/bench
+*.safetensors
+!fixtures/constants/residue_constants.safetensors
+*.bin
+weights/
+.esmfold/
