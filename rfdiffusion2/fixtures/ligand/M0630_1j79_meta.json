@@ -1,0 +1,52 @@
+{
+  "atom_frames_recompute_mismatches": 1,
+  "atom_frames_source": "reference pipeline run",
+  "ligands": [
+    {
+      "atom_names": [
+        "ZN  "
+      ],
+      "elements": [
+        "Hg"
+      ],
+      "n_atoms": 1,
+      "n_chirals": 0,
+      "name": "ZN",
+      "offset": 0
+    },
+    {
+      "atom_names": [
+        " N1 ",
+        " C2 ",
+        " O2 ",
+        " N3 ",
+        " C4 ",
+        " O4 ",
+        " C5 ",
+        " C6 ",
+        " C7 ",
+        " O71",
+        " O72"
+      ],
+      "elements": [
+        "N",
+        "C",
+        "O",
+        "N",
+        "C",
+        "O",
+        "C",
+        "C",
+        "C",
+        "O",
+        "O"
+      ],
+      "n_atoms": 11,
+      "n_chirals": 3,
+      "name": "ORO",
+      "offset": 1
+    }
+  ],
+  "n_atoms_total": 12,
+  "pdb": "M0630_1j79.pdb"
+}

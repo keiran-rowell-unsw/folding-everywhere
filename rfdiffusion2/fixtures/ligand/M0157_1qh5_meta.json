@@ -1,0 +1,70 @@
+{
+  "atom_frames_recompute_mismatches": 3,
+  "atom_frames_source": "reference pipeline run",
+  "ligands": [
+    {
+      "atom_names": [
+        "ZN  "
+      ],
+      "elements": [
+        "Hg"
+      ],
+      "n_atoms": 1,
+      "n_chirals": 0,
+      "name": "ZN",
+      "offset": 0
+    },
+    {
+      "atom_names": [
+        " N1 ",
+        " CA1",
+        " C1 ",
+        " O11",
+        " O12",
+        " CB1",
+        " CG1",
+        " CD1",
+        " OE1",
+        " N2 ",
+        " CA2",
+        " C2 ",
+        " O2 ",
+        " CB2",
+        " SG2",
+        " N3 ",
+        " CA3",
+        " C3 ",
+        " O31",
+        " O32"
+      ],
+      "elements": [
+        "N",
+        "C",
+        "C",
+        "O",
+        "O",
+        "C",
+        "C",
+        "C",
+        "O",
+        "N",
+        "C",
+        "C",
+        "O",
+        "C",
+        "S",
+        "N",
+        "C",
+        "C",
+        "O",
+        "O"
+      ],
+      "n_atoms": 20,
+      "n_chirals": 6,
+      "name": "GSH",
+      "offset": 1
+    }
+  ],
+  "n_atoms_total": 21,
+  "pdb": "M0157_1qh5.pdb"
+}

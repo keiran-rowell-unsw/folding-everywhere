@@ -1,0 +1,22 @@
+[14:42:07] p01_L30  M0636_1uaq  L-contig=10,A64-64,10  T=2  -
+[14:43:05] p02_L31  M0710_1ra0  L-contig=10,A156-156,10  T=2  -
+[14:44:04] p03_L32  M0054_1qfe  L-contig=10,A86-86,10  T=2  -
+[14:45:19] p04_L38  M0097_1ctt  L-contig=10,A102-102,10  T=2  -
+[14:46:38] p05_L45  M0375_4ts9  L-contig=10,A20-20,10  T=2  -
+[14:48:22] p06_L49  M0179_1q3s  L-contig=10,A64-64,10  T=2  -
+[14:50:15] p07_L69  M0365_1pfk  L-contig=10,A11-11,10  T=2  -
+[skip done] p08_L71
+[14:52:22] p09_L82  M0315_1ey3  L-contig=10,A98-98,10  T=2  -
+[14:57:13] p10_L117  M0093_1dqa  L-contig=10,A691-691,10  T=2  -
+[15:06:50] len05_L61  M0584_1ldm  L-contig=5,A106-106,5  T=2  -
+[15:09:33] len25_L101  M0584_1ldm  L-contig=25,A106-106,25  T=2  -
+[15:16:53] len40_L131  M0584_1ldm  L-contig=40,A106-106,40  T=2  -
+[15:29:28] len05_s  M0179_1q3s  L-contig=5,A64-64,5  T=2  -
+[15:30:45] len25_s  M0179_1q3s  L-contig=25,A64-64,25  T=2  -
+[15:35:12] cfg_T10  M0584_1ldm  L-contig=10,A106-106,10  T=10  -
+[15:52:25] cfg_T10s  M0179_1q3s  L-contig=10,A64-64,10  T=10  -
+[16:00:39] cfg_selfcond  M0584_1ldm  L-contig=10,A106-106,10  T=2  selfcond
+[16:04:17] cfg_selfcond_s  M0179_1q3s  L-contig=10,A64-64,10  T=2  selfcond
+[16:06:09] cfg_varlen  M0584_1ldm  L-contig=5-15,A106-106,5-15  T=2  -
+[16:10:10] cfg_varlen_s  M0179_1q3s  L-contig=5-15,A64-64,5-15  T=2  -
+[16:13:19] ALL CASES DONE

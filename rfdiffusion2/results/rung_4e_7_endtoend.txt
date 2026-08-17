@@ -1,0 +1,190 @@
+Rung 4e + rung 7 — end to end, measured 2026-08-10
+==================================================
+
+Every number below was printed by a test or by a diff and copied verbatim.
+Machine / environment as in results/README.md (4-core x86-64, no GPU,
+torch 2.4.0+cpu, PYTORCH_JIT=0, RFD2_PINNED=1).
+
+Configuration under test (the RFD_173 demo, T reduced so the loop fits):
+
+  --config-name=aa
+  input_pdb   rf_diffusion/benchmark/input/mcsa_41/M0584_1ldm.pdb
+  ligand      NAD,OXM        contigs  '10,A106-106,10'
+  contig_as_guidepost=False  deterministic=True  num_designs=1
+  idealize_sidechain_outputs=False   diffuser.T=2
+  L = 71, 20 diffused, t_step_input = 2, model_runner = NRBStyleSelfCond
+
+
+1. Rung 4e — sample_init, from the PDB file on disk  (tolerance: exactly 0)
+---------------------------------------------------------------------------
+tests/parity_sample_init.rs
+
+  indep (cond)    seq 71 · idx 71 · bond_feats 5041 · same_chain 5041 ·
+                  is_gp 71 · terminus_type 71 · chirals 240 · xyz 7668
+  indep_uncond    same eight fields, all exact
+  indep_orig      same eight fields, all exact
+  is_diffused     match          t_step_input  2
+  torch generator after sample_init   64 / 64 following draws bit-identical
+                                      (1 477 draws consumed)
+
+tests/parity_backbone.rs — the two pieces that were missing
+
+  compute_backbone[0]   atom37 7881 / 7881   atom14 2982 / 2982
+  compute_backbone[1]   atom37 7881 / 7881   atom14 2982 / 2982
+  atom37_from_rigid[0]  7881 / 7881, generator lands exactly
+  atom37_from_rigid[1]  7881 / 7881, generator lands exactly
+
+
+2. Rung 4b completed — prepro, Indep -> Rfi  (tolerance: exactly 0)
+--------------------------------------------------------------------
+tests/parity_prepro.rs, against fixtures/model_pinned/step0.safetensors
+
+  msa_latent    11 644 / 11 644      t1d        16 188 / 16 188
+  msa_full       5 893 /  5 893      t2d       685 576 / 685 576   <- new
+  xyz            7 668 /  7 668      xyz_t         426 / 426
+  sctors         2 840 /  2 840      alpha_t     8 520 / 8 520     <- new
+  dist_matrix    5 041 /  5 041      chirals       240 / 240
+  seq / seq_unmasked / idx / bond_feats / mask_t / same_chain / is_motif  exact
+
+  `alpha_t` and `t2d` had never been built: rung 4b deferred them and the
+  network tests read both out of a fixture. They are the two tensors that make
+  the port able to construct its own input.
+
+
+3. forward_from_rfi — the wrapper between the network and the sampler
+----------------------------------------------------------------------
+tests/parity_score.rs
+
+  rot_to_quat                     71 / 71 quaternions (46 exact, 25 sign-
+                                  flipped; the eigenvector sign is arbitrary)
+  quat_to_rot of both             639 / 639 bit-identical
+  rigids_from_rfo   rots       25 560 / 25 560      trans  8 520 / 8 520
+  compute_backbone on the composed frames  315 240 / 315 240
+  whole wrapper (network included, 40.6 s):
+      atom37   304 194 / 315 240   max|d| 2.289e-5 A
+      px0        7 608 /   7 881   max|d| 2.193e-5 A   max|d|/rms 7.489e-6
+      generator after the psi draw   32 / 32 bit-identical
+
+
+4. Rung 7 — the denoising loop
+-------------------------------
+tests/parity_sampler.rs
+
+  normed_exp schedule   scaling(0)   10.0004539490  bit-identical
+                        scaling(0.5) 10.0678367615  bit-identical
+  Euler step, both steps, from the reference's own frames:
+                        trans 60 / 60      rots 180 / 180
+  whole loop (2 steps, 81 s):
+      t = 2   px0 7 666 / 7 881  max|d| 8.106e-6 A  (/rms 2.77e-6)
+      t = 1   px0 7 597 / 7 881  max|d| 3.004e-5 A  (/rms 9.90e-6)
+      generator after the loop   64 / 64 bit-identical
+
+
+5. The program — PDB in, PDB out
+---------------------------------
+  cargo run --release --bin rfd2 -- --input-pdb <M0584_1ldm.pdb> \
+      --contigs '10,A106-106,10' --ligand NAD,OXM \
+      --ligand-topology fixtures/ligand/M0584_1ldm.safetensors \
+      --weights fixtures/weights/model_state_dict.safetensors \
+      --igso3 fixtures/noiser/stages.safetensors --T 2 --output-prefix <out>
+
+  80.6 s for T = 2 at L = 71 on 4 cores.
+
+  Against the reference's own output file:
+
+      267 lines, 161 atoms
+      atom prefixes (name / residue / chain / number / element)  161 / 161 exact
+      CONECT records                                             106 / 106 exact
+      ligand coordinates                                          50 /  50 exact
+      protein coordinates                                        102 / 111 exact
+      9 differing lines, max 0.048 A, all in residues 1-2
+
+  Attributed, not assumed (tests/debug_e2e.rs): the same writer fed the
+  reference's own `px0` instead of the port's produces **exactly the same 9
+  lines**. So the output path is byte-correct and the residual is entirely the
+  3.0e-5 A difference in `px0`, amplified by the two rounds of backbone
+  idealization at the chain's N-terminus, where the frame is least constrained.
+  That 3.0e-5 A is the documented 1-ULP MKL f64 tie in `main_block.0`
+  (docs/BITEXACT.md), for which the *reference* is the one that is 1 ULP wrong.
+
+
+6. A real non-determinism in the reference's output writer
+-----------------------------------------------------------
+`dev/idealize_backbone.rewrite` re-parses the PDB it was handed and calls
+`aa_model.get_ligands`, which returns a **Python `set`**. `','.join(ligands)`
+then iterates that set, and CPython randomises string hashes, so the ligand
+order handed to `make_indep` — and therefore the order of the HETATM block in
+the final file — depends on `PYTHONHASHSEED`.
+
+Measured, two runs of the *unmodified* reference, same seed, same config,
+differing only in PYTHONHASHSEED:
+
+    PYTHONHASHSEED unset (=0 here)   HETATM block: 6 OXM, then 44 NAD
+    PYTHONHASHSEED=1                 HETATM block: 44 NAD, then 6 OXM
+    the 111 ATOM lines                identical between the two runs
+
+So `inference.deterministic=True` does not make the output file deterministic.
+The port emits the ligands in input order (NAD, OXM), which matches
+PYTHONHASHSEED=1; the diff in §5 is against that run. Reproducing the *other*
+order would mean reproducing CPython's hash randomisation, which is not a
+property of RFdiffusion2.
+
+
+7. What is NOT measured here
+-----------------------------
+- the `.trb` output file — not written by the port yet;
+- T = 100 (the demo's real setting) — one run is ~1 h at this speed and has
+  not been done;
+- num_designs > 1, i.e. the per-design reseed;
+- every rung-8 configuration: atomization, guideposts, self-conditioning,
+  partial_T, variable-length contigs, any other input or ligand;
+- the 20-protein benchmark, and any cross-platform build.
+
+
+8. Rung 8 progress — 2026-08-10 (later)
+----------------------------------------
+
+Self-conditioning (`inference.str_self_cond=True`), T=2
+  The flag is a real behavioural change, checked before it was tested: the
+  reference's step-1 px0 moves by up to 0.974 A with it on, while step 0 is
+  untouched (the guard is `t < T`, and the first step has t == T).
+
+      t = 2   px0 7666 / 7881   max|d| 8.106e-6 A   (/rms 2.77e-6)
+      t = 1   px0 7585 / 7881   max|d| 3.004e-5 A   (/rms 9.99e-6)
+      generator after the loop  64 / 64 bit-identical
+
+  Same residual as the non-self-conditioned run, i.e. self-conditioning adds
+  no error of its own.  tests/parity_selfcond.rs
+
+`diffuser.partial_T` — implemented, not exercisable on this input
+  `validate_partial_diffusion` requires the contig to be an identity mapping
+  over the whole input PDB. The demo contig is not, and **the reference itself
+  crashes** (`IndexError: index 54 is out of bounds for dimension 0 with size
+  54`) rather than reporting it. The port implements the same four checks and
+  refuses with a message naming which one failed. Exercising the feature needs
+  a whole-chain identity contig plus `inpaint_str` — a rung-8 config of its own.
+
+Variable-length contig + `contigmap.length`  ***BYTE-IDENTICAL***
+  `contigs=['5-15,A106-106,5-15']  contigmap.length=25-25`, T=2, L=75.
+
+  `get_sampled_mask` resolves each range with CPython's `random.randint` and
+  re-samples the whole contig until the total matches, so the number of draws
+  is not a function of the contig alone. From `random.seed(0)` the reference
+  sampled `10-10,A106-106,14-14` (10 + 1 + 14 = 25) and left CPython's
+  generator at position 55, having twisted. The port reproduces the sampled
+  mask exactly (tests/parity_varcontig.rs).
+
+  End to end, port vs reference:
+
+      287 lines, 181 atoms
+      differing lines                    0 / 287        BYTE-IDENTICAL
+      protein coordinates  max|d| 0.0000 A   (0 of 131 above 0.0005)
+      ligand  coordinates  max|d| 0.0000 A   (0 of  50 above 0.0005)
+
+  This is the first fully byte-identical end-to-end output, and it is the
+  Stage 0 conclusion showing up in practice: the port is correctly rounded, so
+  when the trunk's rare 1-ULP tie does not fire on a given trajectory, the
+  whole file matches exactly. The demo contig's 9 differing lines are that tie
+  firing once, not a systematic gap.
+
+  Reference: 34.5 s.  Port: 93.3 s (L = 75, T = 2, 4 cores).

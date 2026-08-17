@@ -1,0 +1,46 @@
+{
+  "atom_frames_recompute_mismatches": 0,
+  "atom_frames_source": "reference pipeline run",
+  "ligands": [
+    {
+      "atom_names": [
+        "ZN  "
+      ],
+      "elements": [
+        "Hg"
+      ],
+      "n_atoms": 1,
+      "n_chirals": 0,
+      "name": "ZN",
+      "offset": 0
+    },
+    {
+      "atom_names": [
+        " N3 ",
+        " C2 ",
+        " O2 ",
+        " N1 ",
+        " C6 ",
+        " C5 ",
+        " C4 ",
+        " O4 "
+      ],
+      "elements": [
+        "N",
+        "C",
+        "O",
+        "N",
+        "C",
+        "C",
+        "C",
+        "O"
+      ],
+      "n_atoms": 8,
+      "n_chirals": 0,
+      "name": "DUC",
+      "offset": 1
+    }
+  ],
+  "n_atoms_total": 9,
+  "pdb": "M0636_1uaq.pdb"
+}

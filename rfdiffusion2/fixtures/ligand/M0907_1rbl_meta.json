@@ -1,0 +1,88 @@
+{
+  "atom_frames_recompute_mismatches": 13,
+  "atom_frames_source": "reference pipeline run",
+  "ligands": [
+    {
+      "atom_names": [
+        "MG  "
+      ],
+      "elements": [
+        "Mg"
+      ],
+      "n_atoms": 1,
+      "n_chirals": 0,
+      "name": "MG",
+      "offset": 0
+    },
+    {
+      "atom_names": [
+        " C1 ",
+        " C2 ",
+        " C3 ",
+        " C4 ",
+        " C5 ",
+        " C  ",
+        " O1 ",
+        " O2 ",
+        " O3 ",
+        " O4 ",
+        " O5 ",
+        " O6 ",
+        " O7 ",
+        " P1 ",
+        " P2 ",
+        " O1P",
+        " O2P",
+        " O3P",
+        " O4P",
+        " O5P",
+        " O6P"
+      ],
+      "elements": [
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "O",
+        "O",
+        "O",
+        "O",
+        "O",
+        "O",
+        "O",
+        "P",
+        "P",
+        "O",
+        "O",
+        "O",
+        "O",
+        "O",
+        "O"
+      ],
+      "n_atoms": 21,
+      "n_chirals": 18,
+      "name": "CAP",
+      "offset": 1
+    },
+    {
+      "atom_names": [
+        " C  ",
+        " O1 ",
+        " O2 "
+      ],
+      "elements": [
+        "C",
+        "O",
+        "O"
+      ],
+      "n_atoms": 3,
+      "n_chirals": 0,
+      "name": "FMT",
+      "offset": 22
+    }
+  ],
+  "n_atoms_total": 25,
+  "pdb": "M0907_1rbl.pdb"
+}

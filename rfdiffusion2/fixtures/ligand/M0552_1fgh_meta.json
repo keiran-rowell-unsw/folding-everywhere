@@ -1,0 +1,44 @@
+{
+  "atom_frames_recompute_mismatches": 0,
+  "atom_frames_source": "reference pipeline run",
+  "ligands": [
+    {
+      "atom_names": [
+        " C1 ",
+        " C2 ",
+        " C3 ",
+        " C4 ",
+        " C5 ",
+        " C6 ",
+        " O1 ",
+        " O2 ",
+        " O3 ",
+        " O4 ",
+        " O5 ",
+        " O6 ",
+        " OH "
+      ],
+      "elements": [
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "O",
+        "O",
+        "O",
+        "O",
+        "O",
+        "O",
+        "O"
+      ],
+      "n_atoms": 13,
+      "n_chirals": 3,
+      "name": "ATH",
+      "offset": 0
+    }
+  ],
+  "n_atoms_total": 13,
+  "pdb": "M0552_1fgh.pdb"
+}

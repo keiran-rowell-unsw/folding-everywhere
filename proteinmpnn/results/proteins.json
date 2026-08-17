@@ -1,0 +1,106 @@
+{
+ "seed": 20240804,
+ "total_matching": 16681,
+ "proteins": [
+  {
+   "pdb_id": "1UXO",
+   "offset": 2246,
+   "n_ca": 184
+  },
+  {
+   "pdb_id": "6EKB",
+   "offset": 10792,
+   "n_ca": 62
+  },
+  {
+   "pdb_id": "1WV3",
+   "offset": 2412,
+   "n_ca": 181
+  },
+  {
+   "pdb_id": "7XND",
+   "offset": 14545,
+   "n_ca": 169
+  },
+  {
+   "pdb_id": "7L6J",
+   "offset": 13761,
+   "n_ca": 217
+  },
+  {
+   "pdb_id": "7Z0D",
+   "offset": 14592,
+   "n_ca": 314
+  },
+  {
+   "pdb_id": "7NL3",
+   "offset": 13911,
+   "n_ca": 233
+  },
+  {
+   "pdb_id": "6PBQ",
+   "offset": 11530,
+   "n_ca": 154
+  },
+  {
+   "pdb_id": "3JZ9",
+   "offset": 5093,
+   "n_ca": 195
+  },
+  {
+   "pdb_id": "5O6Q",
+   "offset": 9413,
+   "n_ca": 137
+  },
+  {
+   "pdb_id": "2HLV",
+   "offset": 3334,
+   "n_ca": 149
+  },
+  {
+   "pdb_id": "4O8H",
+   "offset": 7403,
+   "n_ca": 170
+  },
+  {
+   "pdb_id": "1YB3",
+   "offset": 2515,
+   "n_ca": 163
+  },
+  {
+   "pdb_id": "6F9Y",
+   "offset": 10879,
+   "n_ca": 130
+  },
+  {
+   "pdb_id": "4KHV",
+   "offset": 6997,
+   "n_ca": 135
+  },
+  {
+   "pdb_id": "5LOZ",
+   "offset": 9174,
+   "n_ca": 144
+  },
+  {
+   "pdb_id": "4AVE",
+   "offset": 6236,
+   "n_ca": 111
+  },
+  {
+   "pdb_id": "3DQ5",
+   "offset": 4641,
+   "n_ca": 230
+  },
+  {
+   "pdb_id": "4BCT",
+   "offset": 6281,
+   "n_ca": 215
+  },
+  {
+   "pdb_id": "3CM0",
+   "offset": 4544,
+   "n_ca": 184
+  }
+ ]
+}

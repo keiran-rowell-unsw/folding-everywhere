@@ -1,0 +1,52 @@
+{
+  "atom_frames_recompute_mismatches": 6,
+  "atom_frames_source": "reference pipeline run",
+  "ligands": [
+    {
+      "atom_names": [
+        "MN  "
+      ],
+      "elements": [
+        "Mn"
+      ],
+      "n_atoms": 1,
+      "n_chirals": 0,
+      "name": "MN",
+      "offset": 0
+    },
+    {
+      "atom_names": [
+        " C1 ",
+        " C2 ",
+        " C3 ",
+        " P  ",
+        " O1 ",
+        " O2 ",
+        " O3 ",
+        " O1P",
+        " O2P",
+        " O3P",
+        " O4P"
+      ],
+      "elements": [
+        "C",
+        "C",
+        "C",
+        "P",
+        "O",
+        "O",
+        "O",
+        "O",
+        "O",
+        "O",
+        "O"
+      ],
+      "n_atoms": 11,
+      "n_chirals": 3,
+      "name": "2PG",
+      "offset": 1
+    }
+  ],
+  "n_atoms_total": 12,
+  "pdb": "M0738_1o98.pdb"
+}

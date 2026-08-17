@@ -1,0 +1,104 @@
+Stage 0 — is the port correctly rounded?  Measured 2026-08-10
+==============================================================
+
+The question this answers
+-------------------------
+The port and the pinned reference disagree by <= 1 ULP on a small fraction of
+values, which grows to 3.0e-5 A on `px0` and 0.048 A on 9 lines of the output
+PDB. `docs/BITEXACT.md` previously recorded that ONE hand-checked dot product
+came out in the port's favour, and concluded "the reference is the one that is
+1 ULP wrong". That was one value, checked once. It did not establish that the
+port's own f64 accumulation is correctly rounded, nor that the hand-checked
+value was the only case.
+
+Method
+-------
+Products of two fp32 values are EXACT in f64 (24 + 24 = 48 <= 53), so every
+reduction in this network is a sum of exact f64 terms and the only error is in
+the summation. Building with `--features exact` swaps every such reduction onto
+a double-double accumulator (`src/ops/acc.rs`, Knuth two_sum, ~106 significand
+bits). Its accumulated relative error is ~2^-104 against ~2^-53 for the default
+lane-split f64 path, so it is correctly rounded to fp32 unless the exact value
+lies within 2^-104 of an fp32 midpoint -- about 2^-80 of values, i.e. never.
+
+The accumulator switch is a compile-time feature, not a runtime flag, so the
+tuned kernels are untouched in the default build. Confirmed: the default build
+reproduces the previously recorded parity numbers to every digit (see below).
+`tests/parity_exact_gemm.rs::accumulator_is_what_the_feature_says` asserts the
+two builds are actually distinct, so the A/B cannot be vacuously green.
+
+Result 1 — a full forward, both accumulators
+---------------------------------------------
+tests/parity_exact_gemm.rs, from fixtures/model_pinned/step0.safetensors
+
+  default (lane-split f64)   40.3 s
+  exact   (double-double)   403.7 s      10.0x slower
+
+  simulator.msa / pair / xyzaa / state, concatenated:
+      998 260 output values
+      fast.bin vs exact.bin        BYTE-IDENTICAL   (cmp, 3 993 040 bytes)
+
+  and against the reference, identical under both builds:
+      simulator.msa     max|d|/rms 6.971e-6
+      simulator.pair    max|d|/rms 6.685e-6
+      simulator.xyzaa   max|d|/rms 1.053e-6
+      simulator.state   max|d|/rms 6.258e-7
+
+Result 2 — main_block.0, both accumulators
+--------------------------------------------
+tests/parity_blocks.rs, from the reference's own captured block inputs
+
+                     default accumulator          exact accumulator
+  main_block.0.xyz   99.84% max_ulp=1             99.84% max_ulp=1
+  main_block.0.alpha 88.70% max_ulp=361           88.70% max_ulp=361
+  main_block.0.quat  97.54% max_ulp=20            97.54% max_ulp=20
+
+Identical to every printed digit. This is the block where the disagreement was
+originally bisected, so it is the one that mattered most.
+
+Result 3 — a bound on the reference's GEMM
+--------------------------------------------
+python/probe_exact_gemm.py --capture
+
+Hooked the real `main_block.0.pair2pair.row_attn.to_k` during a reference
+forward (its input is layer-normed inside the attention, so it cannot be
+reconstructed from the block input -- an earlier attempt did that and got
+-52.06 where the true value is -1.95).
+
+  to_k input (5041, 192)  weight (192, 192)
+  element [4427, 157]:  exact (fsum) -1.950901172688791
+                        -> correctly rounded f32  -1.9509012
+                        pinned reference gave     -1.9509012   MATCH
+  all 967 872 outputs vs an np.longdouble scan, fsum-confirmed:
+                        0 disagreements
+
+So MKL's f64 GEMM is NOT systematically sloppy: at this shape, on real data, it
+is correctly rounded everywhere. That is consistent with the ~2e-9 per-value tie
+rate `tests/probe_f64_tie.rs` measures -- 1e6 outputs is ~1000x too small a
+sample to expect a hit. The disagreements are rare individual ties spread over
+the ~1e9 reductions a forward pass performs, not a defect in one kernel.
+
+The answer
+-----------
+**The port is correctly rounded; the reference is not.**
+
+Result 1 and Result 2 are independent measurements of the same thing: the
+port's answer does not move when the accumulator is given 53 more bits.
+Therefore the port already computes the correctly-rounded fp32 value of the
+pinned algorithm, and wherever the two sides differ by 1 ULP, the reference is
+the side that is wrong.
+
+Scope, stated precisely: the A/B covers every *reduction* (GEMMs, attention
+contractions, group-norm and softmax sums, SE(3) message sums). It says nothing
+about elementwise `+ - * /`, which need no argument -- computing them in f64 and
+rounding once gives exactly the fp32 result -- or about the transcendentals,
+which go through the same f64 libm on both sides.
+
+Consequence for every gate below this one
+-------------------------------------------
+Byte-identity between the port's output PDB and a pinned-reference run is
+**unattainable by construction**, not a missing piece of work. The right gate is
+the one already in use: the port is correctly rounded, and each disagreement is
+localised and attributed. The 9 differing lines in
+`results/rung_4e_7_endtoend.txt` are now accounted for at the bottom of the
+stack rather than at the top.

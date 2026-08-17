@@ -1,0 +1,32 @@
+=== pinned reproducibility across thread counts (4 vs 2 threads) ===
+out::model.simulator.str_refiner.2                        2840  100.0000%   0.000e+00  1.000000106
+
+91/91 tensors bit-identical
+ALL TENSORS BIT-IDENTICAL
+
+=== stock fp32 vs pinned f64-round-once (same model, same seed) ===
+model_stock vs model_pinned: 91 common tensors (0 unique)
+
+tensor                                                       n  bitexact%      max|Δ|          cos
+out::model.simulator.main_block.31.1                    967872    0.0157%   1.261e+00  1.000011309
+out::model.simulator.1                                  967872    0.0157%   1.261e+00  1.000011309
+out::model.simulator.main_block.0.1                     967872    0.0126%   2.161e-01  1.000037165
+out::model.simulator.main_block.31.0                     18176    0.0055%   2.108e-01  0.999999734
+out::model.simulator.0                                   18176    0.0055%   2.108e-01  0.999999734
+out::model.simulator.main_block.1.1                     967872    0.0131%   2.093e-01  1.000034051
+out::model.simulator.extra_block.3.1                    967872    0.0139%   2.036e-01  1.000031144
+out::model.simulator.extra_block.0.1                    967872    0.0243%   6.327e-02  1.000038856
+out::model.templ_emb.0                                  967872    0.0430%   3.383e-02  1.000031838
+out::model.simulator.extra_block.3.0                      4544    0.0440%   2.506e-02  1.000000000
+out::model.simulator.main_block.0.0                      18176    0.0935%   2.431e-02  0.999999810
+out::model.simulator.main_block.1.0                      18176    0.0605%   2.361e-02  0.999999792
+out::model.recycle.1                                    967872   24.7403%   1.817e-02  1.000022294
+x_t_next                                                  7668   95.5790%   1.800e-02  1.000000103
+out::model.simulator.2                                   25560   69.0180%   1.629e-02  0.999999694
+out::model.simulator.main_block.1.2                        639   69.0141%   1.251e-02  0.999999903
+out::model.simulator.extra_block.0.2                       639   69.0141%   1.076e-02  0.999999824
+out::model.simulator.main_block.0.2                        639   69.0141%   1.062e-02  1.000000000
+px0                                                       7881   94.8230%   1.045e-02  1.000000000
+
+38/91 tensors bit-identical
+max |Δ| over all tensors: 1.261e+00

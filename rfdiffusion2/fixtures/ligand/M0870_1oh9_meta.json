@@ -1,0 +1,120 @@
+{
+  "atom_frames_recompute_mismatches": 3,
+  "atom_frames_source": "reference pipeline run",
+  "ligands": [
+    {
+      "atom_names": [
+        " PB ",
+        " O1B",
+        " O2B",
+        " O3B",
+        " PA ",
+        " O1A",
+        " O2A",
+        " O3A",
+        " O5'",
+        " C5'",
+        " C4'",
+        " O4'",
+        " C3'",
+        " O3'",
+        " C2'",
+        " O2'",
+        " C1'",
+        " N9 ",
+        " C8 ",
+        " N7 ",
+        " C5 ",
+        " C6 ",
+        " N6 ",
+        " N1 ",
+        " C2 ",
+        " N3 ",
+        " C4 "
+      ],
+      "elements": [
+        "P",
+        "O",
+        "O",
+        "O",
+        "P",
+        "O",
+        "O",
+        "O",
+        "O",
+        "C",
+        "C",
+        "O",
+        "C",
+        "O",
+        "C",
+        "O",
+        "C",
+        "N",
+        "C",
+        "N",
+        "C",
+        "C",
+        "N",
+        "N",
+        "C",
+        "N",
+        "C"
+      ],
+      "n_atoms": 27,
+      "n_chirals": 24,
+      "name": "ADP",
+      "offset": 0
+    },
+    {
+      "atom_names": [
+        " CA ",
+        " C  ",
+        " OXT",
+        " O  ",
+        " CB ",
+        " CG ",
+        " CD ",
+        " OE1",
+        " OE2",
+        " C7 ",
+        " C8 ",
+        " O7 ",
+        " N2 "
+      ],
+      "elements": [
+        "C",
+        "C",
+        "O",
+        "O",
+        "C",
+        "C",
+        "C",
+        "O",
+        "O",
+        "C",
+        "C",
+        "O",
+        "N"
+      ],
+      "n_atoms": 13,
+      "n_chirals": 3,
+      "name": "NLG",
+      "offset": 27
+    },
+    {
+      "atom_names": [
+        "MG  "
+      ],
+      "elements": [
+        "Mg"
+      ],
+      "n_atoms": 1,
+      "n_chirals": 0,
+      "name": "MG",
+      "offset": 40
+    }
+  ],
+  "n_atoms_total": 41,
+  "pdb": "M0870_1oh9.pdb"
+}

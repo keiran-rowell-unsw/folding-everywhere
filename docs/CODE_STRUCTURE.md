@@ -1,137 +1,96 @@
-# Code structure & logic — esmfold-fp32
+# Code structure
 
-A pure-Rust, fp32 reimplementation of **ESMFold v1**. Input: an amino-acid
-sequence. Output: 3D all-atom coordinates (PDB) + pLDDT / pTM / PAE. Everything is
-deterministic and validated layer-by-layer against PyTorch fp32 (cosine = 1.0 at
-every stage; end-to-end ~0.0001 Å RMSD).
-
----
-
-## 1. End-to-end data flow
+A map of the repository. Each model also has its own, deeper structure document:
+[`esmfold/docs/CODE_STRUCTURE.md`](../esmfold/docs/CODE_STRUCTURE.md),
+[`proteinmpnn/docs/CODE_STRUCTURE.md`](../proteinmpnn/docs/CODE_STRUCTURE.md),
+[`rfdiffusion2/docs/`](../rfdiffusion2/docs/).
 
 ```
- sequence "MQIF..."
-   │  tokenizer.rs            (chars -> ESM 33-token ids, +<cls>/<eos>)
-   ▼
- ESM-2 3B backbone  esm2.rs   (36 pre-LN transformer layers, rotary attention)
-   │  -> 37 hidden states  [L+2, 2560]
-   ▼
- LM→trunk glue  pipeline.rs   (softmax(esm_s_combine)·states -> MLP -> +aa embedding)
-   │  -> s_s_0 [L,1024],  s_z_0 = 0 [L,L,128]
-   ▼
- Folding trunk  trunk.rs      (×4 recycles):
-   │     relative-position embed -> 48 × TriangularSelfAttentionBlock
-   │     each block: pair→seq bias, gated seq attention, seq MLP,
-   │                 seq→pair, tri-mul(out/in), tri-attention(start/end), pair MLP
-   ▼  s_s [L,1024], s_z [L,L,128]
- Structure module  structure.rs (8 shared iterations):
-   │     IPA -> backbone-frame update (quaternions) -> angle resnet ->
-   │     torsion→frames -> frames+literature→atom14 coords
-   │     (recycling distogram fed back to the next trunk recycle)
-   ▼  atom14 [L,14,3]
- Heads  heads.rs               (distogram, pLDDT, pTM, PAE) + atom14→atom37
-   ▼
- PDB  pdb.rs                   (ATOM records, pLDDT in B-factor)
+folding-everywhere-v2/
+├── gui/                     the app — one binary, three tabs
+│   ├── src/main.rs          HTTP router, the global run lock, shared helpers
+│   ├── src/esmfold.rs       ESMFold 1+2 job logic and weight download
+│   ├── src/mpnn.rs          ProteinMPNN job logic
+│   ├── src/rfd2.rs          RFdiffusion2 job logic and checkpoint download
+│   ├── src/index.html       the whole page: CSS, markup, JS (no CDN assets)
+│   └── data/                IGSO(3) tables, ligand library, the two example structures
+├── esmfold/                 ESMFold 1 + 2 subtree      → esmfold/README.md
+├── proteinmpnn/             ProteinMPNN subtree        → proteinmpnn/README.md
+├── rfdiffusion2/            RFdiffusion2 subtree       → rfdiffusion2/README.md
+├── docs/                    GUI.md · BUILD.md · this file
+├── dist/                    prebuilt apps, one per platform
+├── Cargo.toml               the workspace
+└── build_all.sh             three-platform release build
 ```
 
-The whole thing is orchestrated by `pipeline::fold()` and driven by `bin/fold.rs`.
+## Why one subtree per model
 
----
+Each model was ported in its own repository, and its tests and embedded data reach *upward*
+out of the crate directory with relative paths:
 
-## 2. Module-by-module
+- `proteinmpnn/mpnn/src/embedded.rs` — `include_bytes!("../../weights/v_48_020.pt")`
+- `proteinmpnn/mpnn/tests/*.rs` — `{CARGO_MANIFEST_DIR}/../fixtures/…`
+- `rfdiffusion2/rfd2/tests/*.rs` — `{CARGO_MANIFEST_DIR}/../fixtures/…`
 
-### Foundation
-- **`tensor.rs`** — `Tensor { data: Vec<f32>, shape: Vec<usize> }`. Always
-  row-major & contiguous; `permute`/`t` materialize a fresh buffer so no op depends
-  on stride tricks. This is deliberate: it lets every reduction live in one place
-  with a pinned accumulation order (key to matching PyTorch numerically).
-- **`weights.rs`** — memory-maps the `model.safetensors` file, parses the header
-  once, and serves tensors **by name** as fp32 (`F16`→`F32` upcast is lossless).
-  Because it's mmap'd and we fetch one layer at a time, peak RAM is a couple of GB
-  even though the model is ~3.5 B params.
-- **`parity.rs`** — comparison primitives used by the tests: `max_abs`, `max_rel`,
-  `max_ulp` (bit-level distance), `cosine`.
+ProteinMPNN and RFdiffusion2 both have `fixtures/ops/`, `fixtures/rng/` and
+`fixtures/weights/`, so a single flat `fixtures/` directory would collide. Giving each model
+the directory layout it expects means **not one line of ported model code had to change** to
+merge the three repos — which matters, because every one of those lines is validated against
+a PyTorch reference.
 
-### Core ops (`ops/`)
-- **`matmul.rs`** — `linear(x, w, b)` = PyTorch `F.linear` (`w` is `[out,in]`). The
-  hot kernel is a vectorizable 8-lane dot (`dot8`) with a fixed reduction order;
-  rayon parallelizes over **output rows only**, so results are identical regardless
-  of thread count. A `linear_f64` (f64 accumulation) exists as a diagnostic to tell
-  rounding noise from real bugs.
-- **`reduce.rs`** — `layer_norm` (biased variance, eps inside sqrt — matches ATen)
-  and `softmax_last` (max-subtracted).
-- **`activation.rs`** — `gelu_erf` (`x·0.5·(1+erf(x/√2))` via `libm::erff`, the exact
-  ESM variant — not the tanh approx), `relu`, `sigmoid`, `softplus`.
-- **`rotary.rs`** — rotary position embeddings: `inv_freq` table, `cos`/`sin`,
-  `rotate_half` apply. Tables computed in f64→f32 to minimize transcendental error.
+## The app
 
-### Language model
-- **`tokenizer.rs`** — the fixed ESM-2 33-token alphabet; `tokenize` adds `<cls>`/`<eos>`.
-- **`esm2.rs`** — ESM-2 3B: token embedding ×0.88 (token-dropout at inference),
-  then 36 pre-LN blocks. Each block = LayerNorm → multi-head attention (q pre-scaled
-  by `head^-0.5` **before** rotary, eager softmax) → residual → LayerNorm → FFN
-  (Linear→erf-GELU→Linear) → residual. Returns the **37-state stack**
-  `[emb, L1…L35, LN_after(L36)]` that ESMFold consumes.
+`gui/` is the only code written for v2. Its three model modules are the job logic of v1's
+three single-model GUIs moved across unchanged — same
+weight URLs, same curl flags, same featurisation, same progress callbacks — so a run through
+a tab is the same computation the single-model app performed. What is new is only the
+plumbing: state ownership, the `/api/<model>/*` route prefixes, and the run lock.
 
-### Folding trunk
-- **`trunk.rs`** — `relative_position` embedding and one `block` (the 9 sub-steps in
-  exact source order) plus `trunk_iter` (relpos + 48 blocks). All the Evoformer-style
-  pieces are here: gated sequence attention with a pair-derived bias, the outer-product
-  `sequence_to_pair`, the two triangular multiplicative updates
-  (`out`: Σ_k a[i,k]·b[j,k]; `in`: Σ_k a[k,i]·b[k,j]), the two triangular attentions
-  (start/end), and the residue MLPs.
+```
+main()
+ ├── bind 127.0.0.1 : first free port in 8710..8759, open the browser
+ ├── build the page: index.html + the two example structures + the ligand index
+ ├── ef : Arc<Mutex<esmfold::State>>      \
+ ├── mp : Arc<Mutex<mpnn::State>>          }  independent per tab
+ ├── rf : Arc<Mutex<rfd2::State>>         /
+ ├── running : Arc<AtomicBool>               one job at a time, across all tabs
+ └── for req in server.incoming_requests()
+       ├── GET  /                          → the page
+       ├── */api/esmfold/*                 → esmfold.rs
+       ├── */api/mpnn/*                    → mpnn.rs
+       └── */api/rfd2/*                    → rfd2.rs
+```
 
-### Structure module
-- **`rigid.rs`** — frame math, all hand-written algebra (no eigendecomposition on the
-  inference path): `quat_to_rot`, `rot_vec_mul`, `rot_matmul`, `compose_q_update`
-  (quaternion backbone update + L2 normalize), and a 3×3 `Frame` (compose/apply/from_4x4)
-  for the side-chain frames.
-- **`constants.rs`** — residue constants (rigid-group default frames, atom14↔atom37
-  maps, atom masks, literature atom positions). Embedded in the binary via
-  `include_bytes!` (`Constants::embedded()`), so no external constants file is needed.
-- **`structure.rs`** — the 8-iteration loop: **Invariant Point Attention** (scalar +
-  point + pair attention terms with the AF2 scale constants √(1/48), √(1/3), √(1/54)
-  and softplus head weights), backbone-frame update, `angle_resnet` (7 torsion angles),
-  `torsion_to_frames`, and `frames_to_atom14` (places literature atom positions into
-  the predicted side-chain frames).
+A start request takes the run lock with a `compare_exchange`; if it is already held, the
+request is refused and the tab shows why. Otherwise the job is spawned on a worker thread,
+which releases the lock when it returns. HTTP handlers never block on model work — the page
+polls the tab's status endpoint.
 
-### Heads & output
-- **`heads.rs`** — `distogram` (symmetrized logits), `plddt` (categorical mean over
-  50 bins), `compute_ptm`/`compute_pae` (d0 formula, 64 bins), and `atom14_to_atom37`.
-- **`pdb.rs`** — writes standard PDB ATOM records, pLDDT (×100) in the B-factor column.
+Each job runs inside `catch_unwind`, so a panic deep in a model surfaces as an error line
+rather than a silently dead worker and a page stuck on "Loading model…".
 
-### Orchestration
-- **`pipeline.rs`** — `lm_to_trunk` (the LM→trunk glue), `distogram_bins` (CB-distogram
-  for recycling), and `fold()` which runs the whole pipeline including the 4-recycle
-  loop (each recycle: LayerNorm the recycled s/z, add the recycle distogram embedding,
-  run the trunk, run the structure module, recompute the recycle distogram).
-- **`bin/fold.rs`** — the CLI: parses `--seq`/`--fasta`, finds weights, folds, writes
-  PDB (and optional `--dump` of raw atom37 for benchmarking).
+### The page
 
----
+`gui/src/index.html` is served as one self-contained string. The stylesheet is the slate
+theme the ESMFold and RFdiffusion2 GUIs already shared (`--bg:#0f172a`, `--card:#1e293b`,
+`--accent:#e67e22`); the ProteinMPNN panel was restyled into the same card/fieldset idiom.
+Element IDs are namespaced `ef_` / `mp_` / `rf_`, because all three original pages used
+`#phase`, `#bar`, `#log`, `#err`, `#go`, `#pdb` and `#seed`.
 
-## 3. Numerics / parity strategy
+Three template placeholders are filled at startup rather than at build time, so the examples
+live next to the code that owns them: `__EXAMPLE_SEQ__` (ubiquitin), `__EXAMPLE_BB__`
+(PDB 6EKB), `__EXAMPLE_PDB__` (1LDM motif) and `__LIBRARY__` (the ligand index).
 
-- **fp32 everywhere.** ESM weights are stored F16 in the checkpoint and upcast
-  losslessly to F32; folding weights are already F32.
-- **Deterministic ops.** One reduction order, thread-count-independent. This is why
-  the port reproduces PyTorch fp32 to cosine = 1.0 at every layer.
-- **Why not literal bit-for-bit:** PyTorch's fp32 GEMM uses MKL/oneDNN blocked-SIMD
-  accumulation (a different summation order) and libm transcendentals differ in the
-  last bit. These keep agreement at fp32 epsilon (final coords within ~1e-3 Å);
-  discretized outputs (pTM, atom37 gather) are already bit-exact.
+## The model crates
 
-## 4. Reference harness (`python/`)
+Unchanged from their source repositories. In outline:
 
-Generates the ground-truth fixtures the Rust tests check against, all in pinned,
-single-thread, deterministic fp32: `gen_op_fixtures.py` (per-op), `ref_lm.py`
-(ESM-2 per layer), `ref_trunk.py` (trunk + structure + heads), `export_constants.py`,
-`ref_fold.py` + `benchmark.py` (full reference + timing/memory). The PyTorch fp32
-reference is run **decomposed** (ESM ~11 GB, then the folding head ~2.8 GB) so it fits
-in 15 GB; the Rust binary does the whole thing in one process via weight streaming.
+| Crate | Path | Shape |
+|---|---|---|
+| `esmfold1` (lib `esmfold`) | `esmfold/esmfold1/` | `tensor`, `ops/`, `pth` (ZIP64+pickle reader), `weights`, `tokenizer`, `esm2`, `trunk`, `structure`, `rigid`, `heads`, `pdb`, `pipeline` |
+| `esmfold2-fp32` (lib `esmfold2`) | `esmfold/esmfold2/` | `tensor`, `ops/`, `weights`, `esmc`, `msa`, `parcae`, `trunk`, `diffusion`, `atom`, `confidence`, `rng`, `featurize`, `pdb`, `pipeline`, `standalone` |
+| `proteinmpnn` | `proteinmpnn/mpnn/` | `tensor`, `ops/`, `pth`, `weights`, `embedded`, `pdb`, `featurize`, `features`, `layers`, `model`, `rng` |
+| `rfd2` | `rfdiffusion2/rfd2/` | `tensor`, `ops/`, `pth`, `weights`, `chemical`, `openfold`, `ligand`, `prepro`, `featurize`, `sample_init`, `noiser`, `model/` (incl. `rf`, `se3`), `design` |
 
-## 5. Tests (`tests/`)
-
-`parity_ops` (ops), `parity_lm` (ESM-2), `parity_trunk` (48 blocks), `parity_structure`
-(IPA + all-atom), `parity_heads` (LM→trunk glue + heads), `parity_e2e` (full fold).
-All 16 pass. Run with `cargo test --release`.
+Their libraries are independent of each other and of the GUI: the app depends on all four,
+but no model crate depends on another.

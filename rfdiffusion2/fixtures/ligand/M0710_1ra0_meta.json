@@ -1,0 +1,48 @@
+{
+  "atom_frames_recompute_mismatches": 1,
+  "atom_frames_source": "reference pipeline run",
+  "ligands": [
+    {
+      "atom_names": [
+        "FE  "
+      ],
+      "elements": [
+        "Fe"
+      ],
+      "n_atoms": 1,
+      "n_chirals": 0,
+      "name": "FE",
+      "offset": 0
+    },
+    {
+      "atom_names": [
+        " N1 ",
+        " C2 ",
+        " O2 ",
+        " N3 ",
+        " C4 ",
+        " O4 ",
+        " C5 ",
+        " F5 ",
+        " C6 "
+      ],
+      "elements": [
+        "N",
+        "C",
+        "O",
+        "N",
+        "C",
+        "O",
+        "C",
+        "F",
+        "C"
+      ],
+      "n_atoms": 9,
+      "n_chirals": 0,
+      "name": "FPY",
+      "offset": 1
+    }
+  ],
+  "n_atoms_total": 10,
+  "pdb": "M0710_1ra0.pdb"
+}

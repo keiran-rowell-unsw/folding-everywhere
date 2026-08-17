@@ -1,0 +1,76 @@
+{
+  "atom_frames_recompute_mismatches": 11,
+  "atom_frames_source": "reference pipeline run",
+  "ligands": [
+    {
+      "atom_names": [
+        "MG  "
+      ],
+      "elements": [
+        "Mg"
+      ],
+      "n_atoms": 1,
+      "n_chirals": 0,
+      "name": "MG",
+      "offset": 0
+    },
+    {
+      "atom_names": [
+        " P  ",
+        " O1P",
+        " O2P",
+        " O3P",
+        " O5'",
+        " C5'",
+        " C4'",
+        " O4'",
+        " C3'",
+        " O3'",
+        " C2'",
+        " O2'",
+        " C1'",
+        " N9 ",
+        " C8 ",
+        " N7 ",
+        " C5 ",
+        " C6 ",
+        " N6 ",
+        " N1 ",
+        " C2 ",
+        " N3 ",
+        " C4 "
+      ],
+      "elements": [
+        "P",
+        "O",
+        "O",
+        "O",
+        "O",
+        "C",
+        "C",
+        "O",
+        "C",
+        "O",
+        "C",
+        "O",
+        "C",
+        "N",
+        "C",
+        "N",
+        "C",
+        "C",
+        "N",
+        "N",
+        "C",
+        "N",
+        "C"
+      ],
+      "n_atoms": 23,
+      "n_chirals": 12,
+      "name": "AMP",
+      "offset": 1
+    }
+  ],
+  "n_atoms_total": 24,
+  "pdb": "M0904_1qgx.pdb"
+}

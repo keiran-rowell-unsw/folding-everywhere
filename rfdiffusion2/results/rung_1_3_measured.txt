@@ -1,0 +1,14 @@
+relu: 6009 values bit-identical
+elu: 6009 values, 5944 bit-identical, 65 within 1 ULP of exp (max |Δ| 5.9604645e-8 at x=-2.9799998e0)
+embedding emb_80x256: 38400 values exact
+embedding emb_83x64: 9600 values exact
+embedding emb_164x256: 38400 values exact
+layer_norm: worst max|Δ| 1.907e-6
+softmax: worst max|Δ| 8.941e-7
+linear: 45 cases, worst max|Δ| 2.146e-6 at lin_114x64_r150
+numpy normal: 37110 values bit-identical
+scipy Rotation.random: 9450 f64 values bit-identical
+torch randn/rand: 74052 values bit-identical
+pt reader exposes 14419 names: 7208 EMA, 7208 final
+EMA vs final: 570/7208 tensors bit-identical
+pt loader: 7208/7208 tensors, 82911693 parameters bit-identical to torch.load

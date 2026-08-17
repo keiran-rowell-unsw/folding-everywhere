@@ -1,0 +1,73 @@
+[07:38:34] M0024_1nzy  ligands=BCA  anchor=A64
+      atom_frames: taken from the reference run; 0/53 differ from recomputation (set-order ties)
+[07:39:39] M0040_13pk  ligands=MG,ADP,3PG  anchor=A39
+      atom_frames: taken from the reference run; 12/39 differ from recomputation (set-order ties)
+[07:40:24] M0050_1dbt  ligands=U5P  anchor=A33
+      atom_frames: taken from the reference run; 0/21 differ from recomputation (set-order ties)
+[skip] M0054_1qfe (already has named sidecar)
+[07:40:53] M0058_1cju  ligands=MG,DAD  anchor=A396
+      atom_frames: taken from the reference run; 12/30 differ from recomputation (set-order ties)
+[07:41:28] M0078_1al6  ligands=OAA,HAX  anchor=A244
+      atom_frames: taken from the reference run; 19/61 differ from recomputation (set-order ties)
+[07:42:44] M0092_1dli  ligands=NAD,UDX  anchor=A118
+      atom_frames: taken from the reference run; 14/78 differ from recomputation (set-order ties)
+[skip] M0093_1dqa (already has named sidecar)
+[07:44:34] M0096_1chm  ligands=CMS  anchor=A232
+      atom_frames: taken from the reference run; 0/9 differ from recomputation (set-order ties)
+[skip] M0097_1ctt (already has named sidecar)
+[07:44:57] M0110_1c0p  ligands=FAD,DAL,PER  anchor=A1054
+      atom_frames: taken from the reference run; 3/61 differ from recomputation (set-order ties)
+[07:46:17] M0129_1os7  ligands=FE2,TAU,AKG  anchor=A99
+      atom_frames: taken from the reference run; 9/18 differ from recomputation (set-order ties)
+[07:46:44] M0151_1q0n  ligands=MG,APC,PH2  anchor=A82
+      atom_frames: taken from the reference run; 19/46 differ from recomputation (set-order ties)
+[07:47:39] M0157_1qh5  ligands=ZN,GSH  anchor=A54
+      atom_frames: taken from the reference run; 3/21 differ from recomputation (set-order ties)
+[skip] M0179_1q3s (already has named sidecar)
+[07:48:09] M0188_1xel  ligands=NAD,UPG  anchor=A124
+      atom_frames: taken from the reference run; 17/80 differ from recomputation (set-order ties)
+[07:50:14] M0209_1lij  ligands=MG,RPP,ACP  anchor=A136
+      atom_frames: taken from the reference run; 13/52 differ from recomputation (set-order ties)
+[07:51:41] M0255_1mg5  ligands=ACT,NAI  anchor=A108
+      atom_frames: taken from the reference run; 22/48 differ from recomputation (set-order ties)
+[skip] M0315_1ey3 (already has named sidecar)
+[07:53:19] M0349_1e3v  ligands=DXC  anchor=A16
+      atom_frames: taken from the reference run; 0/28 differ from recomputation (set-order ties)
+[skip] M0365_1pfk (already has named sidecar)
+[skip] M0375_4ts9 (already has named sidecar)
+[07:54:19] M0500_1e3i  ligands=NAI,CXF,ZN  anchor=A46
+      atom_frames: taken from the reference run; 4/54 differ from recomputation (set-order ties)
+[07:56:05] M0552_1fgh  ligands=ATH  anchor=A100
+      atom_frames: taken from the reference run; 0/13 differ from recomputation (set-order ties)
+[07:56:41] M0555_1f8r  ligands=CIT,FAD  anchor=A223
+      atom_frames: taken from the reference run; 31/66 differ from recomputation (set-order ties)
+[skip] M0584_1ldm (already has named sidecar)
+[07:58:13] M0630_1j79  ligands=ZN,ORO  anchor=A250
+      atom_frames: taken from the reference run; 1/12 differ from recomputation (set-order ties)
+[skip] M0636_1uaq (already has named sidecar)
+[07:58:36] M0663_1rk2  ligands=RIB,ADP  anchor=A252
+      atom_frames: taken from the reference run; 15/37 differ from recomputation (set-order ties)
+[07:59:18] M0664_2dhn  ligands=PH2  anchor=A22
+      atom_frames: taken from the reference run; 0/14 differ from recomputation (set-order ties)
+[07:59:41] M0674_1uf7  ligands=CDV  anchor=A46
+      atom_frames: taken from the reference run; 0/11 differ from recomputation (set-order ties)
+[skip] M0710_1ra0 (already has named sidecar)
+[08:00:04] M0711_2esd  ligands=NAP,G3H  anchor=A154
+      atom_frames: taken from the reference run; 6/58 differ from recomputation (set-order ties)
+[08:01:14] M0717_1x7d  ligands=NAD,ORN  anchor=A56
+      atom_frames: taken from the reference run; 4/53 differ from recomputation (set-order ties)
+[08:02:17] M0731_1mt5  ligands=MAY  anchor=A142
+      atom_frames: taken from the reference run; 0/24 differ from recomputation (set-order ties)
+[08:02:47] M0732_1xs1  ligands=DUT  anchor=A124
+      atom_frames: taken from the reference run; 0/28 differ from recomputation (set-order ties)
+[08:03:20] M0738_1o98  ligands=MN,2PG  anchor=A62
+      atom_frames: taken from the reference run; 6/12 differ from recomputation (set-order ties)
+[08:03:42] M0739_1knp  ligands=FAD,SIN  anchor=A290
+      atom_frames: taken from the reference run; 0/61 differ from recomputation (set-order ties)
+[08:04:57] M0870_1oh9  ligands=ADP,NLG,MG  anchor=A8
+      atom_frames: taken from the reference run; 3/41 differ from recomputation (set-order ties)
+[08:05:44] M0904_1qgx  ligands=MG,AMP  anchor=A49
+      atom_frames: taken from the reference run; 11/24 differ from recomputation (set-order ties)
+[08:06:14] M0907_1rbl  ligands=MG,CAP,FMT  anchor=A175
+      atom_frames: taken from the reference run; 13/25 differ from recomputation (set-order ties)
+[08:06:44] LIGAND LIBRARY RUNS DONE

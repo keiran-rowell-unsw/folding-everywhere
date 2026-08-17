@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Folding Everywhere — ESMFold · ProteinMPNN · RFdiffusion2</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--ink:#e2e8f0;--muted:#94a3b8;--accent:#e67e22;--accent2:#2e86c1;--ok:#22c55e;--err:#ef4444}
+*{box-sizing:border-box} body{margin:0;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px}
+.head{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+h1{font-size:22px;margin:0} .sub{color:var(--muted);font-size:13px;margin:6px 0 18px}
+.links{display:flex;gap:8px}
+a.pill{display:inline-block;text-decoration:none;font-size:12px;font-weight:600;color:#dbeafe;background:#1d3a5f;border:1px solid #2e5a8a;border-radius:999px;padding:5px 12px}
+.card{background:var(--card);border:1px solid #334155;border-radius:12px;padding:18px;margin-bottom:16px}
+label{font-size:13px;color:var(--muted)} .lab{display:flex;justify-content:space-between;align-items:center}
+.example{font-size:12px;color:#7dd3fc;cursor:pointer;text-decoration:underline}
+textarea{width:100%;height:120px;margin-top:6px;background:#0b1220;color:var(--ink);border:1px solid #334155;border-radius:8px;padding:10px;font-family:ui-monospace,Consolas,monospace;font-size:12px;resize:vertical}
+.row{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
+button{background:var(--accent);color:#111;border:0;border-radius:8px;padding:10px 18px;font-weight:600;cursor:pointer;font-size:14px}
+button:disabled{opacity:.5;cursor:default}
+button.ghost{background:#1d3a5f;color:#dbeafe;border:1px solid #2e5a8a}
+.muted{color:var(--muted);font-size:12px}
+input[type=number],input[type=text],select{background:#0b1220;color:var(--ink);border:1px solid #334155;border-radius:6px;padding:6px 8px}
+input[type=number]{width:92px} input[type=text]{width:210px;font-family:ui-monospace,Consolas,monospace;font-size:12px}
+select{font-size:13px}
+.drop{border:1.5px dashed #334155;border-radius:10px;padding:18px;text-align:center;color:var(--muted);cursor:pointer;margin-top:8px;font-size:13px}
+.drop.hot{border-color:var(--accent);color:var(--ink)}
+.barwrap{height:10px;background:#0b1220;border-radius:6px;overflow:hidden;margin:10px 0}
+.bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .3s}
+.phase{font-size:14px;margin-bottom:2px}
+.log{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;color:var(--muted);white-space:pre;overflow-x:auto;height:250px;overflow-y:scroll;background:#0b1220;border:1px solid #334155;border-radius:8px;padding:10px;margin-top:10px}
+.err{color:var(--err);font-size:13px;margin-top:8px;white-space:pre-wrap}
+.ok{color:var(--ok)} a.btn{display:inline-block;background:var(--ok);color:#04210f;text-decoration:none;border-radius:8px;padding:9px 16px;font-weight:600;margin-right:8px}
+.stats{display:flex;gap:24px;margin-top:8px;font-size:14px;flex-wrap:wrap}
+.stats b{font-size:16px}
+fieldset{border:1px solid #334155;border-radius:8px;margin-top:12px;padding:10px}
+legend{font-size:12px;color:var(--muted);padding:0 6px}
+.liglist{max-height:190px;overflow-y:auto;border:1px solid #334155;border-radius:8px;background:#0b1220;padding:6px;margin-top:8px;display:grid;grid-template-columns:repeat(auto-fill,minmax(126px,1fr));gap:2px}
+.liglist label{display:flex;align-items:center;gap:6px;padding:3px 5px;border-radius:5px;cursor:pointer;font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--ink)}
+.liglist label:hover{background:#16233a}
+.liglist .n{color:var(--muted);font-size:10.5px}
+canvas{width:100%;height:230px;background:#0b1220;border:1px solid #334155;border-radius:8px;margin-top:10px;cursor:grab}
+/* --- tab strip ----------------------------------------------------------- */
+.tabs{display:flex;gap:6px;border-bottom:1px solid #334155;margin:0 0 18px}
+.tabs button{background:transparent;color:var(--muted);border:1px solid transparent;border-bottom:0;
+  border-radius:9px 9px 0 0;padding:9px 16px;font-size:14px;font-weight:600;position:relative;top:1px}
+.tabs button:hover{color:var(--ink)}
+.tabs button.on{background:var(--card);color:var(--ink);border-color:#334155;border-bottom:1px solid var(--card)}
+.tabs button .t{color:var(--muted);font-weight:400;font-size:11px;display:block;margin-top:1px}
+.tabs button.on .t{color:var(--accent)}
+/* --- ProteinMPNN results table ------------------------------------------- */
+table{border-collapse:collapse;width:100%;font-size:12px;margin-top:12px}
+th,td{text-align:left;padding:7px 9px;border-bottom:1px solid #334155;vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.seq{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;word-break:break-all;line-height:1.45}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.tag{display:inline-block;padding:1px 7px;border-radius:20px;background:#0b1220;border:1px solid #334155;font-size:11px;color:var(--muted)}
+code{background:#0b1220;padding:1px 5px;border-radius:4px;font-size:12px}
+</style></head><body><div class="wrap">
+
+<div class="head">
+  <h1>Folding Everywhere <span class="muted">— pure-Rust fp32 protein design</span></h1>
+  <div class="links">
+    <a class="pill" href="https://github.com/lingxusb/folding-everywhere" target="_blank" rel="noopener">Project ↗</a>
+    <a class="pill" href="https://lingxusb.github.io" target="_blank" rel="noopener">Author ↗</a>
+  </div>
+</div>
+<div class="sub">Three protein models in one program. No Python, no PyTorch, no GPU — pure Rust on the CPU. Nothing leaves this machine; the server listens on 127.0.0.1 only.</div>
+
+<div class="tabs">
+  <button id="tb_esmfold" onclick="showTab('esmfold')">ESMFold<span class="t">sequence → structure</span></button>
+  <button id="tb_mpnn"    onclick="showTab('mpnn')">ProteinMPNN<span class="t">structure → sequence</span></button>
+  <button id="tb_rfd2"    onclick="showTab('rfd2')">RFdiffusion2<span class="t">motif → backbone</span></button>
+</div>
+
+<!-- ==================================================================== -->
+<!-- ESMFold                                                              -->
+<!-- ==================================================================== -->
+<section id="tab_esmfold">
+<div class="sub">Fold a protein sequence to 3D all-atom coordinates.</div>
+<div class="card">
+  <fieldset>
+    <legend>Model</legend>
+    <div class="row">
+      <label><input type="radio" name="ef_model" value="1" checked> <b>ESMFold1</b> — ESM-2 3B, deterministic (~8 GB, faster)</label>
+    </div>
+    <div class="row">
+      <label><input type="radio" name="ef_model" value="2"> <b>ESMFold2</b> — ESM-C 6B + diffusion (~30 GB, slower)</label>
+    </div>
+    <div class="row" id="ef_seedrow" style="display:none">
+      <label>Seed <input id="ef_seed" type="number" value="0" min="0"></label>
+      <label>Loops <input id="ef_loops" type="number" value="20" min="1" max="64"></label>
+      <label>Sampling steps <input id="ef_steps" type="number" value="68" min="1" max="200"></label>
+    </div>
+    <div class="row" id="ef_e2note" style="display:none">
+      <span class="muted">ESMFold2 is stochastic: same seed → identical structure (bit-exact to a PyTorch fp32 run at that seed). ESMFold1 has no seed. <b>Loops</b> (trunk refinement) and <b>sampling steps</b> (diffusion) default to the official release depth (20 / 68); lower them for a faster, lower-quality fold. Our benchmarks use 3 / 14 to make the bit-exact fp32 check fast. (A single diffusion sample is produced.)</span>
+    </div>
+  </fieldset>
+  <div class="lab" style="margin-top:14px"><label for="ef_seq">Protein sequence (one-letter codes)</label>
+    <span class="example" id="ef_ex">Load example (ubiquitin, 76 aa)</span></div>
+  <textarea id="ef_seq" placeholder="Paste a protein sequence, or click &quot;Load example&quot; above."></textarea>
+  <div class="row">
+    <button id="ef_go">Fold protein</button>
+    <span class="muted" id="ef_hint">First run downloads the selected model (one time).</span>
+  </div>
+</div>
+<div class="card" id="ef_progcard" style="display:none">
+  <div class="phase" id="ef_phase">Starting…</div>
+  <div class="barwrap"><div class="bar" id="ef_bar"></div></div>
+  <div class="muted" id="ef_pct">0%</div>
+  <div class="muted" id="ef_modelpath" style="font-family:ui-monospace,Consolas,monospace;word-break:break-all"></div>
+  <div class="log" id="ef_log"></div>
+  <div class="err" id="ef_err"></div>
+</div>
+<div class="card" id="ef_result" style="display:none">
+  <div class="ok" style="font-weight:600;margin-bottom:6px">✓ Prediction complete</div>
+  <div class="stats"><div>mean pLDDT (0–100): <b id="ef_plddt">–</b></div><div>pTM: <b id="ef_ptm">–</b></div></div>
+  <div class="row"><a class="btn" id="ef_dl" href="/api/esmfold/pdb">Download PDB</a></div>
+</div>
+</section>
+
+<!-- ==================================================================== -->
+<!-- ProteinMPNN                                                          -->
+<!-- ==================================================================== -->
+<section id="tab_mpnn" style="display:none">
+<div class="sub">Design amino-acid sequences that fold to a given backbone. All four published checkpoints are compiled into this program — nothing to download.</div>
+<div class="card">
+  <fieldset>
+    <legend>Input backbone</legend>
+    <div class="lab"><label for="mp_pdb">Backbone PDB</label>
+      <span class="example" id="mp_ex">Load example (6EKB, 62 aa)</span></div>
+    <div class="drop" id="mp_drop">Drop a <b>.pdb</b> backbone here<br><span class="muted">or click to choose a file</span></div>
+    <input type="file" id="mp_file" accept=".pdb,.ent,.txt" style="display:none">
+    <textarea id="mp_pdb" placeholder="ATOM      1  N   MET A   1      ..."></textarea>
+    <canvas id="mp_cv"></canvas>
+    <div class="muted">Cα trace of the backbone — drag to rotate.</div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Design</legend>
+    <div class="row">
+      <label>Model <select id="mp_model">
+        <option value="v_48_002">v_48_002 — 0.02 Å backbone noise</option>
+        <option value="v_48_010">v_48_010 — 0.10 Å</option>
+        <option value="v_48_020" selected>v_48_020 — 0.20 Å (default)</option>
+        <option value="v_48_030">v_48_030 — 0.30 Å</option>
+      </select></label>
+    </div>
+    <div class="row">
+      <label>Sequences <input id="mp_num" type="number" min="1" max="64" value="4"></label>
+      <label>Temperature <input id="mp_temps" type="text" value="0.1" style="width:110px"></label>
+      <label>Seed <input id="mp_seed" type="number" value="37" min="0"></label>
+    </div>
+    <div class="row">
+      <label>Chains <input id="mp_chains" type="text" placeholder="A B (blank = all)" style="width:150px"></label>
+      <label>Omit amino acids <input id="mp_omit" type="text" value="X" style="width:110px"></label>
+    </div>
+    <div class="muted" style="margin-top:6px">Temperature accepts several values separated by spaces (e.g. <code>0.1 0.2</code>) — each gets its own batch. Same seed as <code>protein_mpnn_run.py</code> → same sequences. Lower score = the model is more confident in that sequence.</div>
+  </fieldset>
+
+  <div class="row">
+    <button id="mp_go">Design sequences</button>
+    <button class="ghost" id="mp_cancel" style="display:none">Cancel</button>
+    <span class="muted">No download — the checkpoints are inside this executable.</span>
+  </div>
+</div>
+<div class="card" id="mp_progcard" style="display:none">
+  <div class="phase" id="mp_phase">Starting…</div>
+  <div class="barwrap"><div class="bar" id="mp_bar"></div></div>
+  <div class="muted" id="mp_pct">0%</div>
+  <div class="log" id="mp_log"></div>
+  <div class="err" id="mp_err"></div>
+</div>
+<div class="card" id="mp_result" style="display:none">
+  <div class="ok" style="font-weight:600;margin-bottom:6px">✓ Designs complete</div>
+  <div class="stats">
+    <div>residues: <b id="mp_s_len">–</b></div>
+    <div>chains: <b id="mp_s_chains">–</b></div>
+    <div>native score: <b id="mp_s_native">–</b></div>
+    <div>designs: <b id="mp_s_n">–</b></div>
+    <div>mean recovery: <b id="mp_s_rec">–</b></div>
+    <div>time: <b id="mp_s_time">–</b></div>
+  </div>
+  <div class="row"><a class="btn" id="mp_dl" href="/api/mpnn/fasta" download="designs.fasta">Download FASTA</a></div>
+  <table id="mp_tbl"><thead><tr><th>#</th><th>T</th><th class="num">Score</th>
+    <th class="num">Recovery</th><th>Sequence</th></tr></thead><tbody></tbody></table>
+</div>
+</section>
+
+<!-- ==================================================================== -->
+<!-- RFdiffusion2                                                         -->
+<!-- ==================================================================== -->
+<section id="tab_rfd2" style="display:none">
+<div class="sub">Design an enzyme backbone around a catalytic motif and its ligands.</div>
+<div class="card">
+  <fieldset>
+    <legend>Input structure</legend>
+    <div class="lab"><label for="rf_pdb">Motif PDB (catalytic residues + ligands)</label>
+      <span class="example" id="rf_ex">Load example (1LDM lactate dehydrogenase, NAD + OXM)</span></div>
+    <div class="drop" id="rf_drop">Drop a <b>.pdb</b> here<br><span class="muted">or click to choose a file</span></div>
+    <input type="file" id="rf_file" accept=".pdb,.ent,.txt" style="display:none">
+    <textarea id="rf_pdb" placeholder="ATOM      1  N   MET A   1      ..."></textarea>
+    <canvas id="rf_view"></canvas>
+    <div class="muted">Ligand atoms in orange, motif backbone in blue — drag to rotate.</div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Ligands</legend>
+    <div class="liglist" id="rf_liglist"><span class="muted">Load a structure to see its ligands.</span></div>
+    <div class="muted" id="rf_ligcount" style="margin-top:6px"></div>
+    <div class="row" style="margin-top:10px">
+      <label style="flex:1">Ligand topology file <span class="muted">(optional — only for a ligand not listed above)</span>
+        <input type="text" id="rf_custom" placeholder="/path/to/your.safetensors  (from gen_ligand_bonds.py)" style="width:100%;margin-top:4px">
+      </label>
+    </div>
+    <div class="muted" style="margin-top:6px">Only the ligands present in your structure are shown: the coordinates come from your file, and this program supplies the bond orders and aromaticity, which a PDB cannot express. 56 ligands ship with it, matched to your file <b>by atom name</b>, so they work on any structure.</div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Design</legend>
+    <div class="row">
+      <label>Contig <input type="text" id="rf_contig" value="10,A106-106,10"></label>
+      <label>Length <input type="text" id="rf_length" placeholder="e.g. 25-25" style="width:110px"></label>
+    </div>
+    <div class="row">
+      <label>Steps T <input type="number" id="rf_T" value="100" min="1" max="200"></label>
+      <label>Designs <input type="number" id="rf_n" value="1" min="1" max="20"></label>
+      <label>Seed <input type="number" id="rf_seed" value="0" min="0"></label>
+      <label><input type="checkbox" id="rf_sc"> self-conditioning</label>
+    </div>
+    <div class="muted" style="margin-top:6px">The contig is a comma list: a number is that many <i>designed</i> residues, <code>A106-106</code> keeps motif residue 106 of chain A. <code>10,A106-106,10</code> builds 10 new residues, the catalytic residue, then 10 more. Same seed → identical design, byte for byte. On 4 CPU cores the bundled example takes ~1.7 min at T = 2 and ~70 min at T = 100.</div>
+  </fieldset>
+
+  <div class="row">
+    <button id="rf_go">Design backbone</button>
+    <span class="muted" id="rf_hint">First run downloads the official checkpoint (RFD_173.pt, 1.34 GB, one time).</span>
+  </div>
+</div>
+<div class="card" id="rf_progcard" style="display:none">
+  <div class="phase" id="rf_phase">Starting…</div>
+  <div class="barwrap"><div class="bar" id="rf_bar"></div></div>
+  <div class="muted" id="rf_pct">0%</div>
+  <div class="log" id="rf_log"></div>
+  <div class="err" id="rf_err"></div>
+</div>
+<div class="card" id="rf_result" style="display:none">
+  <div class="ok" style="font-weight:600;margin-bottom:6px">✓ Design complete</div>
+  <div class="stats"><div>designs: <b id="rf_ndone">–</b></div><div>tokens: <b id="rf_len">–</b></div><div>time: <b id="rf_secs">–</b></div></div>
+  <div class="row" id="rf_dls"></div>
+</div>
+</section>
+
+<script>
+const $=id=>document.getElementById(id);
+
+/* Per-tab canvas redraw hooks, installed by each tab's block below. Declared
+   here because showTab() runs before those blocks and calls them on load. */
+let mpDraw=()=>{}, rfDraw=()=>{};
+
+/* ---------------------------------------------------------------- tabs ---- */
+const TABS=['esmfold','mpnn','rfd2'];
+function showTab(t){
+  TABS.forEach(x=>{$('tab_'+x).style.display = x===t?'':'none';
+                   $('tb_'+x).className = x===t?'on':'';});
+  location.hash=t;
+  if(t==='mpnn')mpDraw(); if(t==='rfd2')rfDraw();
+}
+showTab(TABS.includes(location.hash.slice(1))?location.hash.slice(1):'esmfold');
+
+/* small shared helper: a rotatable Cα/ligand sketch on a canvas */
+function makeViewer(canvasId,getPts,redraw){
+  let drag=null;
+  const c=$(canvasId);
+  c.addEventListener('mousedown',e=>drag=[e.clientX,e.clientY]);
+  addEventListener('mouseup',()=>drag=null);
+  addEventListener('mousemove',e=>{if(!drag)return;
+    const r=getPts(); r[0]+=(e.clientX-drag[0])*.01; r[1]+=(e.clientY-drag[1])*.01;
+    drag=[e.clientX,e.clientY]; redraw();});
+}
+
+/* ================================================================ ESMFold == */
+(function(){
+const EXAMPLE="__EXAMPLE_SEQ__";
+$('ef_ex').onclick=()=>{$('ef_seq').value=EXAMPLE;};
+function model(){return document.querySelector('input[name=ef_model]:checked').value;}
+function sync(){const v2=model()==='2';
+  $('ef_seedrow').style.display=v2?'flex':'none';
+  $('ef_e2note').style.display=v2?'flex':'none';
+  $('ef_hint').textContent=v2
+    ?'First run downloads ESMFold2 (~30 GB, one time); folding takes a few minutes (longer at the default 20/68 quality).'
+    :'First run downloads ESMFold1 (~8.4 GB, one time).';}
+document.querySelectorAll('input[name=ef_model]').forEach(r=>r.onchange=sync); sync();
+$('ef_go').onclick=async()=>{
+  const seq=$('ef_seq').value.trim();
+  if(!seq){alert('Enter a sequence, or click "Load example".');return;}
+  $('ef_go').disabled=true; $('ef_result').style.display='none';
+  $('ef_err').textContent=''; $('ef_modelpath').textContent='';
+  $('ef_progcard').style.display='block';
+  await fetch('/api/esmfold/fold',{method:'POST',body:
+    model()+'\n'+$('ef_seed').value+'\n'+$('ef_loops').value+'\n'+$('ef_steps').value+'\n'+seq});
+  poll();
+};
+function poll(){
+  fetch('/api/esmfold/status').then(r=>r.json()).then(s=>{
+    $('ef_phase').textContent=s.phase;
+    $('ef_bar').style.width=(s.progress*100).toFixed(1)+'%';
+    $('ef_pct').textContent=(s.progress*100).toFixed(0)+'%';
+    if(s.model)$('ef_modelpath').textContent='Model: '+s.model;
+    const el=$('ef_log'); const nb=(el.scrollHeight-el.scrollTop-el.clientHeight)<40;
+    el.textContent=s.log.join('\n'); if(nb)el.scrollTop=el.scrollHeight;
+    if(s.error){$('ef_err').textContent='Error: '+s.error; $('ef_go').disabled=false; return;}
+    if(s.done){$('ef_plddt').textContent=s.plddt.toFixed(2); $('ef_ptm').textContent=s.ptm.toFixed(3);
+      $('ef_result').style.display='block'; $('ef_go').disabled=false; return;}
+    setTimeout(poll,700);
+  }).catch(()=>setTimeout(poll,1000));
+}
+})();
+
+/* ============================================================ ProteinMPNN == */
+(function(){
+const EXAMPLE=__EXAMPLE_BB__;
+let pdbText="",ca=[],rot=[0.4,0.3];
+
+function parseCA(t){ca=[];for(const l of (t||'').split('\n')){
+  if(l.startsWith('ATOM')&&l.substr(12,4).trim()==='CA'){
+    const x=+l.substr(30,8),y=+l.substr(38,8),z=+l.substr(46,8);
+    if(isFinite(x)&&isFinite(y)&&isFinite(z))ca.push([x,y,z]);}}}
+function draw(){const c=$('mp_cv');if(!c||!c.clientWidth)return;
+  const dpr=devicePixelRatio||1;c.width=c.clientWidth*dpr;c.height=c.clientHeight*dpr;
+  const g=c.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);
+  const W=c.clientWidth,H=c.clientHeight;g.clearRect(0,0,W,H);
+  if(ca.length<2){g.fillStyle='#94a3b8';g.font='12px sans-serif';
+    g.fillText('no Cα atoms parsed',12,24);return;}
+  let cx=0,cy=0,cz=0;for(const p of ca){cx+=p[0];cy+=p[1];cz+=p[2];}
+  cx/=ca.length;cy/=ca.length;cz/=ca.length;
+  const cA=Math.cos(rot[0]),sA=Math.sin(rot[0]),cB=Math.cos(rot[1]),sB=Math.sin(rot[1]);
+  const pts=ca.map(p=>{const x=p[0]-cx,y=p[1]-cy,z=p[2]-cz;
+    const x1=x*cA+z*sA,z1=-x*sA+z*cA,y1=y*cB-z1*sB,z2=y*sB+z1*cB;return [x1,y1,z2];});
+  let r=1;for(const p of pts)r=Math.max(r,Math.hypot(p[0],p[1]));
+  const s=0.42*Math.min(W,H)/r;
+  g.lineWidth=2;g.lineJoin='round';g.lineCap='round';
+  for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i];
+    if(Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2])>8)continue;
+    const t=i/pts.length;g.strokeStyle='hsl('+(210+120*t)+',70%,'+(52+14*((a[2]+r)/(2*r)))+'%)';
+    g.beginPath();g.moveTo(W/2+a[0]*s,H/2-a[1]*s);g.lineTo(W/2+b[0]*s,H/2-b[1]*s);g.stroke();}}
+mpDraw=draw;
+makeViewer('mp_cv',()=>rot,draw);
+addEventListener('resize',draw);
+
+function load(t){pdbText=t;
+  $('mp_pdb').value=t.slice(0,4000)+(t.length>4000?'\n… ('+t.length+' bytes)':'');
+  parseCA(t);draw();}
+function readFile(f){const r=new FileReader();r.onload=e=>load(e.target.result);r.readAsText(f);}
+$('mp_ex').onclick=()=>load(EXAMPLE);
+$('mp_drop').onclick=()=>$('mp_file').click();
+$('mp_file').onchange=e=>{if(e.target.files[0])readFile(e.target.files[0]);};
+$('mp_drop').ondragover=e=>{e.preventDefault();$('mp_drop').classList.add('hot');};
+$('mp_drop').ondragleave=()=>$('mp_drop').classList.remove('hot');
+$('mp_drop').ondrop=e=>{e.preventDefault();$('mp_drop').classList.remove('hot');
+  if(e.dataTransfer.files[0])readFile(e.dataTransfer.files[0]);};
+$('mp_pdb').oninput=()=>{pdbText=$('mp_pdb').value;parseCA(pdbText);draw();};
+
+$('mp_go').onclick=async()=>{
+  const text=pdbText||$('mp_pdb').value;
+  if(!text.trim()){$('mp_err').textContent='Load a PDB backbone first.';return;}
+  $('mp_err').textContent='';$('mp_go').disabled=true;$('mp_cancel').style.display='';
+  $('mp_result').style.display='none';$('mp_progcard').style.display='block';
+  await fetch('/api/mpnn/run',{method:'POST',body:JSON.stringify({
+    pdb:text,model:$('mp_model').value,num_seq:+$('mp_num').value,
+    temps:$('mp_temps').value,seed:+$('mp_seed').value,
+    chains:$('mp_chains').value.replace(/[^A-Za-z0-9]/g,''),omit:$('mp_omit').value})});
+  poll();};
+$('mp_cancel').onclick=()=>fetch('/api/mpnn/cancel',{method:'POST'});
+
+function poll(){fetch('/api/mpnn/status').then(r=>r.json()).then(s=>{
+  $('mp_bar').style.width=(100*s.progress)+'%';
+  $('mp_pct').textContent=(100*s.progress).toFixed(0)+'%';
+  $('mp_phase').textContent=s.phase||'';
+  $('mp_err').textContent=s.error?'Error: '+s.error:'';
+  const el=$('mp_log'); const nb=(el.scrollHeight-el.scrollTop-el.clientHeight)<40;
+  el.textContent=(s.log||[]).join('\n'); if(nb)el.scrollTop=el.scrollHeight;
+  if(s.results.length||s.done){
+    $('mp_result').style.display='';
+    $('mp_s_len').textContent=s.length||'–';
+    $('mp_s_chains').textContent=s.chains||'–';
+    $('mp_s_native').textContent=s.nativeScore?s.nativeScore.toFixed(4):'–';
+    $('mp_s_n').textContent=s.results.length;
+    const rec=s.results.length?s.results.reduce((a,d)=>a+d.recovery,0)/s.results.length:0;
+    $('mp_s_rec').textContent=(100*rec).toFixed(1)+'%';
+    $('mp_s_time').textContent=s.elapsed?s.elapsed.toFixed(1)+' s':'–';
+    const tb=$('mp_tbl').querySelector('tbody');tb.innerHTML='';
+    for(const d of s.results){const tr=document.createElement('tr');
+      tr.innerHTML='<td class="num">'+d.n+'</td><td><span class="tag">'+d.temp+'</span></td>'+
+        '<td class="num">'+d.score.toFixed(4)+'</td>'+
+        '<td class="num">'+(100*d.recovery).toFixed(1)+'%</td>'+
+        '<td class="seq">'+d.seq+'</td>';tb.appendChild(tr);}
+    draw();
+  }
+  if(s.busy){setTimeout(poll,400);}
+  else{$('mp_go').disabled=false;$('mp_cancel').style.display='none';}
+}).catch(()=>setTimeout(poll,1000));}
+})();
+
+/* =========================================================== RFdiffusion2 == */
+(function(){
+const EXAMPLE=__EXAMPLE_PDB__;
+const LIB=__LIBRARY__;
+let pdbText="",prot=[],lig=[],rot=[0.4,0.3],logSeen=0;
+
+function ligandsInPdb(t){const seen=[];for(const l of (t||'').split('\n'))
+  if(l.startsWith('HETATM')){const r=l.substr(17,3).trim();
+    if(r&&r!=='ORI'&&!seen.includes(r))seen.push(r);}return seen;}
+function selected(){return [...document.querySelectorAll('#rf_liglist input:checked')].map(i=>i.value);}
+function upd(){const s=selected();
+  $('rf_ligcount').textContent = s.length ? s.length+' selected: '+s.join(', ')
+                                          : 'none selected — tick at least one';}
+function renderLigs(){
+  const box=$('rf_liglist'), found=ligandsInPdb(pdbText);
+  box.innerHTML='';
+  if(!found.length){box.innerHTML='<span class="muted">Load a structure to see its ligands.</span>';
+    $('rf_ligcount').textContent='';return;}
+  const known=found.filter(n=>LIB[n]!==undefined), miss=found.filter(n=>LIB[n]===undefined);
+  known.forEach(n=>{const l=document.createElement('label');
+    l.innerHTML='<input type="checkbox" value="'+n+'" checked><span>'+n+
+                '</span><span class="n">'+LIB[n].atoms+'</span>';
+    l.querySelector('input').onchange=upd; box.appendChild(l);});
+  if(miss.length){const w=document.createElement('span');w.className='muted';
+    w.style.gridColumn='1/-1';w.style.padding='4px 5px';
+    w.innerHTML='Not in the library: <b>'+miss.join(', ')+
+      '</b> — build a topology with <code>gen_ligand_bonds.py</code> and give its path below.';
+    box.appendChild(w);}
+  upd();
+}
+function parse(){prot=[];lig=[];for(const l of pdbText.split('\n')){
+  if(l.startsWith('ATOM')&&l.substr(12,4).trim()==='CA')prot.push([+l.substr(30,8),+l.substr(38,8),+l.substr(46,8)]);
+  else if(l.startsWith('HETATM')&&l.substr(17,3).trim()!=='ORI')lig.push([+l.substr(30,8),+l.substr(38,8),+l.substr(46,8)]);}}
+function draw(){const c=$('rf_view');if(!c||!c.clientWidth)return;
+  const x=c.getContext('2d');const w=c.width=c.clientWidth*2,h=c.height=c.clientHeight*2;
+  x.clearRect(0,0,w,h);const all=prot.concat(lig);if(!all.length)return;
+  const m=[0,1,2].map(i=>all.reduce((a,p)=>a+p[i],0)/all.length);
+  let s=0;all.forEach(p=>{s=Math.max(s,Math.hypot(p[0]-m[0],p[1]-m[1],p[2]-m[2]))});s=Math.min(w,h)/2.4/(s||1);
+  const [ay,ax]=rot,ca=Math.cos(ay),sa=Math.sin(ay),cb=Math.cos(ax),sb=Math.sin(ax);
+  const P=p=>{const X=p[0]-m[0],Y=p[1]-m[1],Z=p[2]-m[2];
+    const x1=X*ca-Z*sa,z1=X*sa+Z*ca,y1=Y*cb-z1*sb;return [w/2+x1*s,h/2+y1*s];};
+  x.lineWidth=4;x.strokeStyle='#2e86c1';x.beginPath();
+  prot.forEach((p,i)=>{const q=P(p);i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1])});x.stroke();
+  x.fillStyle='#e67e22';lig.forEach(p=>{const q=P(p);x.beginPath();x.arc(q[0],q[1],5,0,7);x.fill()});}
+rfDraw=draw;
+makeViewer('rf_view',()=>rot,draw);
+addEventListener('resize',draw);
+
+function load(t){pdbText=t;
+  $('rf_pdb').value=t.slice(0,4000)+(t.length>4000?'\n… ('+t.length+' bytes)':'');
+  parse();draw();renderLigs();}
+function readFile(f){const r=new FileReader();r.onload=e=>load(e.target.result);r.readAsText(f);}
+$('rf_ex').onclick=()=>{load(EXAMPLE);$('rf_contig').value='10,A106-106,10';};
+$('rf_drop').onclick=()=>$('rf_file').click();
+$('rf_file').onchange=e=>{if(e.target.files[0])readFile(e.target.files[0]);};
+$('rf_drop').ondragover=e=>{e.preventDefault();$('rf_drop').classList.add('hot');};
+$('rf_drop').ondragleave=()=>$('rf_drop').classList.remove('hot');
+$('rf_drop').ondrop=e=>{e.preventDefault();$('rf_drop').classList.remove('hot');
+  if(e.dataTransfer.files[0])readFile(e.dataTransfer.files[0]);};
+$('rf_pdb').oninput=()=>{pdbText=$('rf_pdb').value;parse();draw();renderLigs();};
+
+$('rf_go').onclick=async()=>{
+  const text=pdbText||$('rf_pdb').value;
+  if(!text.trim()){alert('Load a PDB, or click "Load example".');return;}
+  if(!selected().length && !$('rf_custom').value.trim()){
+    alert('Tick the ligands present in your structure (or give your own topology file).');return;}
+  $('rf_go').disabled=true;$('rf_result').style.display='none';$('rf_err').textContent='';
+  $('rf_log').textContent='';logSeen=0;$('rf_progcard').style.display='block';
+  await fetch('/api/rfd2/design',{method:'POST',body:JSON.stringify({
+    pdb:text,ligands:selected().join(','),contig:$('rf_contig').value,length:$('rf_length').value,
+    T:+$('rf_T').value,n:+$('rf_n').value,seed:+$('rf_seed').value,self_cond:$('rf_sc').checked,
+    custom_sidecar:$('rf_custom').value})});
+  poll();
+};
+function poll(){
+  fetch('/api/rfd2/status?from='+logSeen).then(r=>r.json()).then(s=>{
+    $('rf_phase').textContent=s.phase;
+    $('rf_bar').style.width=(s.progress*100).toFixed(1)+'%';
+    $('rf_pct').textContent=(s.progress*100).toFixed(0)+'%';
+    // append only the rows we have not seen; the window keeps every line
+    if(s.log.length){const el=$('rf_log');
+      const nb=(el.scrollHeight-el.scrollTop-el.clientHeight)<50;
+      el.textContent+=(el.textContent?'\n':'')+s.log.join('\n');
+      logSeen=s.log_total;
+      if(nb)el.scrollTop=el.scrollHeight;}
+    if(s.error){$('rf_err').textContent='Error: '+s.error;$('rf_go').disabled=false;return;}
+    if(s.done){$('rf_ndone').textContent=s.n_done;$('rf_len').textContent=s.length;
+      $('rf_secs').textContent=s.secs.toFixed(1)+' s';
+      $('rf_dls').innerHTML='';
+      for(let i=1;i<=s.n_done;i++){const a=document.createElement('a');a.className='btn';
+        a.href='/api/rfd2/pdb?i='+i;a.textContent='Download design '+i;$('rf_dls').appendChild(a);}
+      $('rf_result').style.display='block';$('rf_go').disabled=false;return;}
+    setTimeout(poll,700);
+  }).catch(()=>setTimeout(poll,1000));
+}
+})();
+</script>
+</div></body></html>

@@ -1,0 +1,46 @@
+{
+  "atom_frames_recompute_mismatches": 0,
+  "atom_frames_source": "reference pipeline run",
+  "ligands": [
+    {
+      "atom_names": [
+        " N1 ",
+        " C2 ",
+        " C3 ",
+        " N4 ",
+        " N5 ",
+        " C6 ",
+        " N6 ",
+        " N7 ",
+        " C8 ",
+        " O8 ",
+        " C9 ",
+        " C10",
+        " C11",
+        " O4 "
+      ],
+      "elements": [
+        "N",
+        "C",
+        "C",
+        "N",
+        "N",
+        "C",
+        "N",
+        "N",
+        "C",
+        "O",
+        "C",
+        "C",
+        "C",
+        "O"
+      ],
+      "n_atoms": 14,
+      "n_chirals": 3,
+      "name": "PH2",
+      "offset": 0
+    }
+  ],
+  "n_atoms_total": 14,
+  "pdb": "M0664_2dhn.pdb"
+}

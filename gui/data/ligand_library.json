@@ -1,0 +1,226 @@
+{
+ "2PG": {
+  "atoms": 11,
+  "source": "M0738_1o98"
+ },
+ "3PG": {
+  "atoms": 11,
+  "source": "M0040_13pk"
+ },
+ "ACP": {
+  "atoms": 31,
+  "source": "M0209_1lij"
+ },
+ "ACT": {
+  "atoms": 4,
+  "source": "M0255_1mg5"
+ },
+ "ADP": {
+  "atoms": 27,
+  "source": "M0040_13pk"
+ },
+ "AKG": {
+  "atoms": 10,
+  "source": "M0129_1os7"
+ },
+ "AMP": {
+  "atoms": 23,
+  "source": "M0904_1qgx"
+ },
+ "APC": {
+  "atoms": 31,
+  "source": "M0151_1q0n"
+ },
+ "ATH": {
+  "atoms": 13,
+  "source": "M0552_1fgh"
+ },
+ "BCA": {
+  "atoms": 53,
+  "source": "M0024_1nzy"
+ },
+ "CAP": {
+  "atoms": 21,
+  "source": "M0907_1rbl"
+ },
+ "CDV": {
+  "atoms": 11,
+  "source": "M0674_1uf7"
+ },
+ "CIT": {
+  "atoms": 13,
+  "source": "M0555_1f8r"
+ },
+ "CMS": {
+  "atoms": 9,
+  "source": "M0096_1chm"
+ },
+ "COA": {
+  "atoms": 48,
+  "source": "M0093_1dqa"
+ },
+ "CXF": {
+  "atoms": 9,
+  "source": "M0500_1e3i"
+ },
+ "DAD": {
+  "atoms": 29,
+  "source": "M0058_1cju"
+ },
+ "DAK": {
+  "atoms": 61,
+  "source": "M0315_1ey3"
+ },
+ "DAL": {
+  "atoms": 6,
+  "source": "M0110_1c0p"
+ },
+ "DHS": {
+  "atoms": 11,
+  "source": "M0054_1qfe"
+ },
+ "DHZ": {
+  "atoms": 16,
+  "source": "M0097_1ctt"
+ },
+ "DUC": {
+  "atoms": 8,
+  "source": "M0636_1uaq"
+ },
+ "DUT": {
+  "atoms": 28,
+  "source": "M0732_1xs1"
+ },
+ "DXC": {
+  "atoms": 28,
+  "source": "M0349_1e3v"
+ },
+ "FAD": {
+  "atoms": 53,
+  "source": "M0110_1c0p"
+ },
+ "FBP": {
+  "atoms": 20,
+  "source": "M0365_1pfk"
+ },
+ "FE": {
+  "atoms": 1,
+  "source": "M0710_1ra0"
+ },
+ "FE2": {
+  "atoms": 1,
+  "source": "M0129_1os7"
+ },
+ "FMC": {
+  "atoms": 19,
+  "source": "M0375_4ts9"
+ },
+ "FMT": {
+  "atoms": 3,
+  "source": "M0907_1rbl"
+ },
+ "FPY": {
+  "atoms": 9,
+  "source": "M0710_1ra0"
+ },
+ "G3H": {
+  "atoms": 10,
+  "source": "M0711_2esd"
+ },
+ "GSH": {
+  "atoms": 20,
+  "source": "M0157_1qh5"
+ },
+ "HAX": {
+  "atoms": 52,
+  "source": "M0078_1al6"
+ },
+ "MAY": {
+  "atoms": 24,
+  "source": "M0731_1mt5"
+ },
+ "MG": {
+  "atoms": 1,
+  "source": "M0040_13pk"
+ },
+ "MN": {
+  "atoms": 1,
+  "source": "M0738_1o98"
+ },
+ "NAD": {
+  "atoms": 44,
+  "source": "M0092_1dli"
+ },
+ "NAI": {
+  "atoms": 44,
+  "source": "M0255_1mg5"
+ },
+ "NAP": {
+  "atoms": 48,
+  "source": "M0093_1dqa"
+ },
+ "NLG": {
+  "atoms": 13,
+  "source": "M0870_1oh9"
+ },
+ "OAA": {
+  "atoms": 9,
+  "source": "M0078_1al6"
+ },
+ "ORN": {
+  "atoms": 9,
+  "source": "M0717_1x7d"
+ },
+ "ORO": {
+  "atoms": 11,
+  "source": "M0630_1j79"
+ },
+ "OXM": {
+  "atoms": 6,
+  "source": "M0584_1ldm"
+ },
+ "PER": {
+  "atoms": 2,
+  "source": "M0110_1c0p"
+ },
+ "PH2": {
+  "atoms": 14,
+  "source": "M0151_1q0n"
+ },
+ "PO4": {
+  "atoms": 5,
+  "source": "M0375_4ts9"
+ },
+ "RIB": {
+  "atoms": 10,
+  "source": "M0663_1rk2"
+ },
+ "RPP": {
+  "atoms": 20,
+  "source": "M0209_1lij"
+ },
+ "SIN": {
+  "atoms": 8,
+  "source": "M0739_1knp"
+ },
+ "TAU": {
+  "atoms": 7,
+  "source": "M0129_1os7"
+ },
+ "U5P": {
+  "atoms": 21,
+  "source": "M0050_1dbt"
+ },
+ "UDX": {
+  "atoms": 34,
+  "source": "M0092_1dli"
+ },
+ "UPG": {
+  "atoms": 36,
+  "source": "M0188_1xel"
+ },
+ "ZN": {
+  "atoms": 1,
+  "source": "M0097_1ctt"
+ }
+}

@@ -1,0 +1,43 @@
+  1qys: 91 residues, 677 atoms placed, 15 hetatoms — exact
+  METAL_RES_NAMES: 52 entries exact
+  aa2long: 653 atom names + 535 empty slots exact
+  aa2longalt: 636 atom names + 516 empty slots exact
+  allatom_mask vs AA2LONG: 1152 polymer slots consistent
+  atom_num: 47 entries exact
+  ec1: 4 residues, 38 atoms placed, 47 hetatoms — exact
+  frame_priority2atom: 47 entries exact
+  mcsa41: 4 residues, 40 atoms placed, 51 hetatoms — exact
+  num2aa: 80 entries exact
+  one_letter: 22 entries exact
+EMA vs final: 570/7208 tensors bit-identical
+dist_matrix: [71,71] = 5041 values exact (3048 unreachable pairs = +inf)
+elu: 6009 values, 5944 bit-identical, 65 within 1 ULP of exp (max |Δ| 5.9604645e-8 at x=-2.9799998e0)
+embedding emb_164x256: 38400 values exact
+embedding emb_83x64: 9600 values exact
+layer_norm (f64-pinned): 106176 values BIT-IDENTICAL
+ligand atom_frames: [50, 3, 2] = 300 values exact
+ligand chirals: 240 values exact (48 constraints)
+ligand sidecar: 50x50 bond block exact (53 bonds), cross-terms to 21 protein positions all zero
+linear (f64-pinned): 45 cases, 1640040 values BIT-IDENTICAL
+mask_t [2,71,71] all-true · sctors [71,20,2] all-zero · xyz_t [2,71,3] = CA coords + zeros — exact
+missing sidecar refused with an actionable message
+msa_full: [71, 83] = 5893 values exact
+msa_masked: [71, 164] = 11644 values exact
+numpy normal: 37110 values bit-identical
+pdb parse: 3 real inputs bit-identical to the reference
+pt loader: 7208/7208 tensors, 82911693 parameters bit-identical to torch.load
+relu: 6009 values bit-identical
+rfi.xyz: [71,36,3] = 7668 values exact (945 real, 4743 zeroed, 1980 NaN)
+scipy Rotation.random: 9450 f64 values bit-identical
+seq / seq_unmasked: 71 tokens exact
+softmax (f64-pinned): 130666 values BIT-IDENTICAL
+t1d: [2, 71, 80] core channels exact (+ self-cond marker -1)
+test activations_within_one_ulp ... okembedding emb_80x256: 38400 values exact
+test embedding_is_exact ... ok
+test layer_norm_and_softmax_bit_exact_under_f64_pinning ... ok
+test linear_bit_exact_under_f64_pinning ... ok
+test numeric_tables_have_the_right_shapes_and_are_self_consistent ... ok
+test pt_reader_matches_torch_load_exactly ... ok
+test unknown_ligand_is_refused_not_guessed ... ok
+torch randn/rand: 74052 values bit-identical
+unknown ligand refused: "NOPE" not in ["NAD", "OXM"]

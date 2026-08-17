@@ -1,0 +1,5 @@
+case	protein	ligands	contig	length	T	extra
+du_mm2	M0584_1ldm	NAD,OXM	10,A106-106,10,A166-166,10	-	2	-
+du_mm4_prod	M0584_1ldm	NAD,OXM	46,A106-106,59,A166-166,2,A169-169,23,A193-193,46	-	2	-
+du_T100_small	M0710_1ra0	FE,FPY	10,A156-156,10	-	100	-
+du_T100_mid	M0179_1q3s	MG,ADP	10,A64-64,10	-	100	-

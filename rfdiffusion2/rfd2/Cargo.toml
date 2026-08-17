@@ -1,0 +1,22 @@
+[package]
+name = "rfd2"
+version = "0.1.0"
+edition = "2021"
+description = "Pure-Rust fp32 reimplementation of RFdiffusion2"
+
+[lib]
+name = "rfd2"
+path = "src/lib.rs"
+
+[features]
+# Swap every reduction onto a double-double accumulator so the port's answer is
+# provably the correctly-rounded one. ~3-5x slower; see src/ops/acc.rs.
+exact = []
+
+[dependencies]
+memmap2 = "0.9"
+rayon = "1.10"
+libm = "0.2"
+serde_json = "1"
+
+[dev-dependencies]

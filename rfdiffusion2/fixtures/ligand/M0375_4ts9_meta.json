@@ -1,0 +1,76 @@
+{
+  "atom_frames_recompute_mismatches": 3,
+  "atom_frames_source": "reference pipeline run",
+  "ligands": [
+    {
+      "atom_names": [
+        " N1 ",
+        " C2 ",
+        " N3 ",
+        " C4 ",
+        " C5 ",
+        " C6 ",
+        " N6 ",
+        " N7 ",
+        " N8 ",
+        " C9 ",
+        " C1'",
+        " C2'",
+        " O2'",
+        " C3'",
+        " O3'",
+        " C4'",
+        " O4'",
+        " C5'",
+        " O5'"
+      ],
+      "elements": [
+        "N",
+        "C",
+        "N",
+        "C",
+        "C",
+        "C",
+        "N",
+        "N",
+        "N",
+        "C",
+        "C",
+        "C",
+        "O",
+        "C",
+        "O",
+        "C",
+        "O",
+        "C",
+        "O"
+      ],
+      "n_atoms": 19,
+      "n_chirals": 15,
+      "name": "FMC",
+      "offset": 0
+    },
+    {
+      "atom_names": [
+        " P  ",
+        " O1 ",
+        " O2 ",
+        " O3 ",
+        " O4 "
+      ],
+      "elements": [
+        "P",
+        "O",
+        "O",
+        "O",
+        "O"
+      ],
+      "n_atoms": 5,
+      "n_chirals": 0,
+      "name": "PO4",
+      "offset": 19
+    }
+  ],
+  "n_atoms_total": 24,
+  "pdb": "M0375_4ts9.pdb"
+}

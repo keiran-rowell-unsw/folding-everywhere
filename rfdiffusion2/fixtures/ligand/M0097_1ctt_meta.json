@@ -1,0 +1,62 @@
+{
+  "atom_frames_recompute_mismatches": 4,
+  "atom_frames_source": "reference pipeline run",
+  "ligands": [
+    {
+      "atom_names": [
+        "ZN  "
+      ],
+      "elements": [
+        "Hg"
+      ],
+      "n_atoms": 1,
+      "n_chirals": 0,
+      "name": "ZN",
+      "offset": 0
+    },
+    {
+      "atom_names": [
+        " N1 ",
+        " C2 ",
+        " O2 ",
+        " N3 ",
+        " C4 ",
+        " C5 ",
+        " C6 ",
+        " C1'",
+        " C2'",
+        " O2'",
+        " C3'",
+        " O3'",
+        " C4'",
+        " O4'",
+        " C5'",
+        " O5'"
+      ],
+      "elements": [
+        "N",
+        "C",
+        "O",
+        "N",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "O",
+        "C",
+        "O",
+        "C",
+        "O",
+        "C",
+        "O"
+      ],
+      "n_atoms": 16,
+      "n_chirals": 12,
+      "name": "DHZ",
+      "offset": 1
+    }
+  ],
+  "n_atoms_total": 17,
+  "pdb": "M0097_1ctt.pdb"
+}

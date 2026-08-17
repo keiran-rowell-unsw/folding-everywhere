@@ -1,0 +1,77 @@
+[
+ {
+  "kind": "linear",
+  "name": "linear_66x16",
+  "m": 512,
+  "k": 66,
+  "o": 16
+ },
+ {
+  "kind": "linear",
+  "name": "linear_416x128",
+  "m": 512,
+  "k": 416,
+  "o": 128
+ },
+ {
+  "kind": "linear",
+  "name": "linear_384x128",
+  "m": 512,
+  "k": 384,
+  "o": 128
+ },
+ {
+  "kind": "linear",
+  "name": "linear_512x128",
+  "m": 512,
+  "k": 512,
+  "o": 128
+ },
+ {
+  "kind": "linear",
+  "name": "linear_128x512",
+  "m": 512,
+  "k": 128,
+  "o": 512
+ },
+ {
+  "kind": "linear",
+  "name": "linear_128x21",
+  "m": 256,
+  "k": 128,
+  "o": 21
+ },
+ {
+  "kind": "layer_norm",
+  "name": "layernorm_128",
+  "rows": 1024,
+  "c": 128
+ },
+ {
+  "kind": "layer_norm",
+  "name": "layernorm_512",
+  "rows": 256,
+  "c": 512
+ },
+ {
+  "kind": "gelu",
+  "name": "gelu",
+  "n": 4101
+ },
+ {
+  "kind": "softmax",
+  "name": "softmax_last"
+ },
+ {
+  "kind": "log_softmax",
+  "name": "log_softmax_last"
+ },
+ {
+  "kind": "embedding",
+  "name": "embedding"
+ },
+ {
+  "kind": "sum_neighbors",
+  "name": "sum_neighbors"
+ }
+]

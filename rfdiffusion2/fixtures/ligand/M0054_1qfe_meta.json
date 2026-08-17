@@ -1,0 +1,40 @@
+{
+  "atom_frames_recompute_mismatches": 0,
+  "atom_frames_source": "reference pipeline run",
+  "ligands": [
+    {
+      "atom_names": [
+        " C1 ",
+        " C3 ",
+        " C4 ",
+        " C5 ",
+        " C6 ",
+        " C7 ",
+        " C2 ",
+        " O2 ",
+        " O3 ",
+        " O4 ",
+        " O5 "
+      ],
+      "elements": [
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "O",
+        "O",
+        "O",
+        "O"
+      ],
+      "n_atoms": 11,
+      "n_chirals": 9,
+      "name": "DHS",
+      "offset": 0
+    }
+  ],
+  "n_atoms_total": 11,
+  "pdb": "M0054_1qfe.pdb"
+}

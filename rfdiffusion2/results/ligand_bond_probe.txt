@@ -1,0 +1,31 @@
+=== How much does OpenBabel contribute to ligand bond features? ===
+(python/probe_ligand_bonds.py, measured on the real demo inputs)
+
+mcsa_41/M0584_1ldm.pdb  (the main demo input)
+  NAD: 44 atoms, 48 bonds, 0 CONECT edges (0 CONECT lines in file)
+       orders {single:33, double:5, aromatic:10}
+       -> connectivity PERCEIVED from geometry
+  OXM:  6 atoms,  5 bonds, 0 CONECT edges
+       orders {single:3, double:2}
+       -> connectivity PERCEIVED from geometry
+
+mcsa_41/M0151_1q0n.pdb
+  47 atoms, 49 bonds, 0 CONECT edges
+       orders {single:28, double:5, aromatic:16}
+       -> connectivity PERCEIVED from geometry
+
+trimmed_ec2_M0151_NO_ORI_zero_com0.pdb
+  PH2: 14 atoms, 15 bonds, 15 CONECT edges (45 CONECT lines)
+       orders {single:11, double:4}
+       -> CONECT connectivity == OpenBabel connectivity: True
+
+CONCLUSION
+For the primary demo inputs OpenBabel is doing BOTH jobs from 3D coordinates:
+  1. ConnectTheDots      - connectivity from interatomic distance + covalent radii
+  2. PerceiveBondOrders  - hybridisation, ring perception, aromaticity, kekulisation
+Only PH2 supplies CONECT records.
+
+This is materially larger than "port a subset of perception rules": aromaticity
+perception and kekulisation are thousands of lines of heuristics, and their
+output feeds bond_feats -> bond_emb directly, so the orders (not just the
+connectivity) change the network input.
