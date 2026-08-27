@@ -128,9 +128,10 @@ pub fn language_model_shim(w: &Weights, hidden_states: &Tensor) -> Tensor {
 // TriangleMultiplicativeUpdate engine
 // ---------------------------------------------------------------------------
 fn triangle_contract(left: &[f32], right: &[f32], l: usize, c: usize, outgoing: bool) -> Vec<f32> {
+    #[cfg(feature = "native")]
     use rayon::prelude::*;
     let mut out = vec![0.0f32; l * l * c];
-    out.par_chunks_mut(l * c).enumerate().for_each(|(i, orow)| {
+    let process = |i: usize, orow: &mut [f32]| {
         let mut acc64 = vec![0.0f64; c];
         for j in 0..l {
             for a in acc64.iter_mut() { *a = 0.0; }
@@ -147,7 +148,11 @@ fn triangle_contract(left: &[f32], right: &[f32], l: usize, c: usize, outgoing: 
             let dst = &mut orow[j * c..j * c + c];
             for d in 0..c { dst[d] = acc64[d] as f32; }
         }
-    });
+    };
+    #[cfg(feature = "native")]
+    out.par_chunks_mut(l * c).enumerate().for_each(|(i, orow)| process(i, orow));
+    #[cfg(not(feature = "native"))]
+    out.chunks_mut(l * c).enumerate().for_each(|(i, orow)| process(i, orow));
     out
 }
 
