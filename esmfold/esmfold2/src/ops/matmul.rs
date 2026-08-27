@@ -3,6 +3,7 @@
 //! sequential 8-lane fp32 fold. Mirrors the validated v1 kernels.
 
 use crate::tensor::Tensor;
+#[cfg(feature = "native")]
 use rayon::prelude::*;
 
 /// Vectorizable fp32 dot product with a fixed 8-lane partial-sum order.
@@ -26,26 +27,47 @@ pub fn dot8(a: &[f32], b: &[f32], k: usize) -> f32 {
 
 /// PyTorch-style Linear: x[..,K] @ w[O,K]^T (+ b[O]) -> [..,O].
 /// `w` is row-major [O,K] (the torch `nn.Linear.weight` layout).
-/// Uses a tuned f32 GEMM (matrixmultiply::sgemm). For the non-chaotic parts
-/// (ESM-C, atom encoder) the f32 accumulation order is fine (validated cosine 1.0).
+/// Uses a tuned f32 GEMM (matrixmultiply::sgemm) on native; falls back to
+/// sequential dot products on wasm.
 pub fn linear(x: &Tensor, w: &Tensor, b: Option<&Tensor>) -> Tensor {
     let k = x.last();
     let m = x.rows();
     assert_eq!(w.shape[1], k, "linear K mismatch x{:?} w{:?}", x.shape, w.shape);
     let o = w.shape[0];
     let mut out = vec![0.0f32; m * o];
-    // C[m,o] = x[m,k] @ (w^T)[k,o].  w is [O,K] row-major -> B[k,o]=w[o,k]: rsb=1, csb=K.
-    unsafe {
-        matrixmultiply::sgemm(
-            m, k, o, 1.0,
-            x.data.as_ptr(), k as isize, 1,
-            w.data.as_ptr(), 1, k as isize,
-            0.0, out.as_mut_ptr(), o as isize, 1,
-        );
+
+    #[cfg(feature = "native")]
+    {
+        // C[m,o] = x[m,k] @ (w^T)[k,o].  w is [O,K] row-major -> B[k,o]=w[o,k]: rsb=1, csb=K.
+        unsafe {
+            matrixmultiply::sgemm(
+                m, k, o, 1.0,
+                x.data.as_ptr(), k as isize, 1,
+                w.data.as_ptr(), 1, k as isize,
+                0.0, out.as_mut_ptr(), o as isize, 1,
+            );
+        }
+        if let Some(bb) = b {
+            out.par_chunks_mut(o).for_each(|orow| { for oi in 0..o { orow[oi] += bb.data[oi]; } });
+        }
     }
-    if let Some(bb) = b {
-        out.par_chunks_mut(o).for_each(|orow| { for oi in 0..o { orow[oi] += bb.data[oi]; } });
+
+    #[cfg(not(feature = "native"))]
+    {
+        for i in 0..m {
+            let xrow = &x.data[i * k..i * k + k];
+            for oi in 0..o {
+                let wrow = &w.data[oi * k..oi * k + k];
+                out[i * o + oi] = dot8(xrow, wrow, k);
+            }
+        }
+        if let Some(bb) = b {
+            for orow in out.chunks_mut(o) {
+                for oi in 0..o { orow[oi] += bb.data[oi]; }
+            }
+        }
     }
+
     let mut shape = x.shape.clone();
     let n = shape.len();
     shape[n - 1] = o;
@@ -64,39 +86,66 @@ pub fn matmul2d(a: &Tensor, b: &Tensor) -> Tensor {
     let ad = &a.data;
     let bd = &b.data;
     let mut out = vec![0.0f32; m * n];
+
+    #[cfg(feature = "native")]
     out.par_chunks_mut(n).enumerate().for_each(|(i, orow)| {
         let arow = &ad[i * k..i * k + k];
         for kk in 0..k {
             let aik = arow[kk];
             let brow = &bd[kk * n..kk * n + n];
-            for j in 0..n {
-                orow[j] += aik * brow[j];
-            }
+            for j in 0..n { orow[j] += aik * brow[j]; }
         }
     });
+
+    #[cfg(not(feature = "native"))]
+    for (i, orow) in out.chunks_mut(n).enumerate() {
+        let arow = &ad[i * k..i * k + k];
+        for kk in 0..k {
+            let aik = arow[kk];
+            let brow = &bd[kk * n..kk * n + n];
+            for j in 0..n { orow[j] += aik * brow[j]; }
+        }
+    }
+
     Tensor::new(out, vec![m, n])
 }
 
-/// Linear with **f64 accumulation** via a tuned GEMM (matrixmultiply::dgemm),
-/// rounded to f32 at the end. Used for the chaos-sensitive pair trunk / parcae /
-/// diffusion-pair ops where f64-accurate accumulation is required to track the
-/// reference. The dgemm reduction order differs from a sequential fold, but both
-/// are f64-accurate (agree to ~1e-13), so the result stays sub-mÅ.
+/// Linear with **f64 accumulation** via a tuned GEMM (matrixmultiply::dgemm) on
+/// native, or sequential f64 dot products on wasm. Rounded to f32 at the end.
+/// Used for chaos-sensitive pair trunk / parcae / diffusion-pair ops.
 pub fn linear_f64(x: &Tensor, w: &Tensor, b: Option<&Tensor>) -> Tensor {
     let k = x.last();
     let m = x.rows();
     let o = w.shape[0];
-    let xf: Vec<f64> = x.data.iter().map(|&v| v as f64).collect();
-    let wf: Vec<f64> = w.data.iter().map(|&v| v as f64).collect();
     let mut cf = vec![0.0f64; m * o];
-    unsafe {
-        matrixmultiply::dgemm(
-            m, k, o, 1.0,
-            xf.as_ptr(), k as isize, 1,
-            wf.as_ptr(), 1, k as isize,
-            0.0, cf.as_mut_ptr(), o as isize, 1,
-        );
+
+    #[cfg(feature = "native")]
+    {
+        let xf: Vec<f64> = x.data.iter().map(|&v| v as f64).collect();
+        let wf: Vec<f64> = w.data.iter().map(|&v| v as f64).collect();
+        unsafe {
+            matrixmultiply::dgemm(
+                m, k, o, 1.0,
+                xf.as_ptr(), k as isize, 1,
+                wf.as_ptr(), 1, k as isize,
+                0.0, cf.as_mut_ptr(), o as isize, 1,
+            );
+        }
     }
+
+    #[cfg(not(feature = "native"))]
+    {
+        for i in 0..m {
+            let xrow = &x.data[i * k..i * k + k];
+            for oi in 0..o {
+                let wrow = &w.data[oi * k..oi * k + k];
+                let mut acc = 0.0f64;
+                for kk in 0..k { acc += xrow[kk] as f64 * wrow[kk] as f64; }
+                cf[i * o + oi] = acc;
+            }
+        }
+    }
+
     if let Some(bb) = b {
         for row in 0..m { for oi in 0..o { cf[row * o + oi] += bb.data[oi] as f64; } }
     }
