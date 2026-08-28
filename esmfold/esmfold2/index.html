@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>ESMFold2 – Browser Demo</title>
+  <style>
+    body { font-family: monospace; max-width: 860px; margin: 2rem auto; padding: 0 1rem; }
+    h1   { font-size: 1.4rem; }
+    textarea { width: 100%; box-sizing: border-box; font-family: monospace; font-size: 0.9rem; }
+    button   { margin-top: 0.5rem; padding: 0.4rem 1.2rem; font-size: 1rem; cursor: pointer; }
+    #dl      { display: none; margin-left: 0.8rem; }
+    pre      { background: #f4f4f4; padding: 0.8rem; min-height: 3rem; white-space: pre-wrap; word-break: break-word; }
+    .err     { color: #c00; }
+  </style>
+</head>
+<body>
+  <h1>ESMFold2 – FASTA → PDB (browser demo)</h1>
+
+  <p>
+    Paste a FASTA sequence (or a bare amino-acid string) and press <strong>Run</strong>.
+    The wasm module will process the request and, once full model weights are wired,
+    return a downloadable <code>.pdb</code> file.
+  </p>
+
+  <label for="fasta"><strong>Input FASTA / sequence</strong></label><br />
+  <textarea id="fasta" rows="8" placeholder=">my_protein&#10;MSEQNNTEMTFQIQRIYTKDISFEAPNAPHVFQKDW"></textarea>
+  <br />
+  <button id="run">Run</button>
+  <a id="dl" download="prediction.pdb">⬇ Download prediction.pdb</a>
+
+  <h2>Status / log</h2>
+  <pre id="log">Loading wasm module…</pre>
+
+  <script type="module">
+    // Loads the wasm module built by:
+    //   wasm-pack build --target web --release
+    // from the same directory.  Serve this file together with the pkg/ folder,
+    // e.g.:  python3 -m http.server 8080
+    import init, { version, fold_json } from "./pkg/esmfold2.js";
+
+    const log = document.getElementById("log");
+    const dl  = document.getElementById("dl");
+
+    let wasmReady = false;
+
+    try {
+      await init();
+      wasmReady = true;
+      const ver = (typeof version === "function") ? version() : "(version() not exported)";
+      log.textContent = `Wasm loaded OK – ${ver}\nReady. Paste a FASTA sequence and press Run.`;
+    } catch (e) {
+      log.classList.add("err");
+      log.textContent = `Failed to load wasm module:\n${e}`;
+    }
+
+    document.getElementById("run").onclick = async () => {
+      if (!wasmReady) {
+        log.textContent = "Wasm module not ready yet.";
+        return;
+      }
+
+      // Reset state from any previous run before validation.
+      log.classList.remove("err");
+      dl.style.display = "none";
+
+      const fasta = document.getElementById("fasta").value.trim();
+      if (!fasta) {
+        log.classList.add("err");
+        log.textContent = "Error: please enter a FASTA sequence.";
+        return;
+      }
+
+      log.textContent = "Running…";
+
+      try {
+        const req = JSON.stringify({
+          fasta,
+          seed: 0,
+          output_format: "pdb"
+        });
+
+        // fold_json is synchronous in the current stub implementation.
+        // When full inference is wired it will be compute-heavy; consider
+        // wrapping in a Web Worker for production use.
+        const respJson = fold_json(req);
+        const resp = JSON.parse(respJson);
+
+        log.textContent =
+          `Format:  ${resp.format}\n` +
+          `pLDDT:   ${resp.plddt.toFixed(3)}\n` +
+          `pTM:     ${resp.ptm.toFixed(3)}\n\n` +
+          resp.structure;
+
+        // Offer download
+        const blob = new Blob([resp.structure], { type: "chemical/x-pdb" });
+        dl.href = URL.createObjectURL(blob);
+        dl.style.display = "inline";
+      } catch (e) {
+        log.classList.add("err");
+        log.textContent = `Error: ${e?.message ?? e}`;
+      }
+    };
+  </script>
+</body>
+</html>
