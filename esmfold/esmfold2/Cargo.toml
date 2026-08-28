@@ -7,16 +7,24 @@ description = "Pure-Rust fp32 bit-exact reimplementation of ESMFold2 (ESM-C 6B +
 [lib]
 name = "esmfold2"
 path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
 
 [[bin]]
 name = "fold_standalone"
 path = "src/bin/fold_standalone.rs"
 
 [dependencies]
-memmap2 = "0.9"
 half = { version = "2", features = ["bytemuck"] }
 bytemuck = "1"
+libm = "0.2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+memmap2 = "0.9"
 rayon = "1.10"
 matrixmultiply = { version = "0.3", features = ["threading"] }
-libm = "0.2"
-serde_json = "1"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2"
+console_error_panic_hook = "0.1"
