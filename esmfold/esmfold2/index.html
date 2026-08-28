@@ -59,6 +59,10 @@
         return;
       }
 
+      // Reset state from any previous run before validation.
+      log.classList.remove("err");
+      dl.style.display = "none";
+
       const fasta = document.getElementById("fasta").value.trim();
       if (!fasta) {
         log.classList.add("err");
@@ -66,9 +70,7 @@
         return;
       }
 
-      log.classList.remove("err");
       log.textContent = "Running…";
-      dl.style.display = "none";
 
       try {
         const req = JSON.stringify({

@@ -153,7 +153,10 @@ pub fn fold_json(req_json: &str) -> Result<String, JsValue> {
 }
 
 /// Parse a FASTA string (possibly multi-line, with a `>header` line) or a raw
-/// uppercase amino-acid sequence.  Returns the concatenated residue string.
+/// uppercase amino-acid sequence.  Returns the residue string.
+///
+/// Returns an error if multiple FASTA records are detected (multiple `>`
+/// header lines), since ESMFold2 folds a single chain at a time.
 ///
 /// This helper is compiled for **all** targets so it can be unit-tested natively.
 pub fn parse_fasta_or_sequence(input: &str) -> Result<String, String> {
@@ -162,6 +165,13 @@ pub fn parse_fasta_or_sequence(input: &str) -> Result<String, String> {
         return Err("empty input".into());
     }
     let seq: String = if s.starts_with('>') {
+        let header_count = s.lines().filter(|l| l.starts_with('>')).count();
+        if header_count > 1 {
+            return Err(format!(
+                "multi-record FASTA with {header_count} sequences is not supported; \
+                 please provide a single sequence"
+            ));
+        }
         s.lines()
             .filter(|l| !l.starts_with('>'))
             .collect::<Vec<_>>()
